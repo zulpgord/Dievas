@@ -25,15 +25,26 @@
   --verd:#5E7A54; --lapis:#3D5D84; --bone:#EFE4C8;
   --hell:#140C07; --sky:#22282A;
   --ok:#5E7A54; --warn:#C39B3A; --bad:#9E2B15;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;height:100%}
+html{height:100%}
+/* iOS: la pagina non scorre mai, scorre solo il contenuto interno */
+body{margin:0;padding:0;position:fixed;inset:0;width:100%;height:100%;overflow:hidden;
+  -webkit-tap-highlight-color:transparent}
+#root{height:100%}
 body{
   background:var(--wood2); color:var(--ink);
   font-family:"EB Garamond",Georgia,"Times New Roman",serif;
   font-size:17px; line-height:1.5; -webkit-font-smoothing:antialiased;
   overscroll-behavior:none;
+  -webkit-text-size-adjust:100%;
 }
+button,.hinge,.realm,.hbtn{touch-action:manipulation}
+.panelhead,.hinges,.hinge,.lbl,.tally span,.stats3 span{-webkit-user-select:none;user-select:none}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none;padding:0;color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -53,8 +64,9 @@ h1,h2{font-family:"Grenze Gotisch",Georgia,serif;letter-spacing:.01em}
 
 /* ---------- cornice del trittico ---------- */
 .panelhead{
-  position:relative;z-index:5;display:flex;align-items:center;gap:12px;
-  padding:11px 15px 10px;
+  position:relative;z-index:5;display:flex;align-items:flex-end;gap:12px;
+  padding:calc(10px + var(--sat)) calc(15px + var(--sar)) 10px calc(15px + var(--sal));
+  min-height:calc(58px + var(--sat));
   background:linear-gradient(to bottom,var(--wood) 0%,var(--wood2) 100%);
   border-bottom:1px solid #120B05;
   box-shadow:0 2px 10px rgba(0,0,0,.5);
@@ -63,7 +75,7 @@ h1,h2{font-family:"Grenze Gotisch",Georgia,serif;letter-spacing:.01em}
 .panelhead h1 small{display:block;font-family:"EB Garamond",serif;font-size:11.5px;letter-spacing:.16em;
   text-transform:uppercase;color:#9A855F;margin-top:5px;font-weight:500}
 .hbtn{
-  min-width:40px;height:38px;padding:0 10px;border:1px solid #16100A;border-radius:2px;
+  min-width:46px;height:44px;padding:0 12px;border:1px solid #16100A;border-radius:2px;
   background:linear-gradient(to bottom,var(--wood3),var(--wood));color:var(--panel2);
   display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(224,205,165,.12);
   font-size:19px;line-height:1;
@@ -76,12 +88,13 @@ h1,h2{font-family:"Grenze Gotisch",Georgia,serif;letter-spacing:.01em}
 
 /* ---------- cerniere / tab ---------- */
 .hinges{
-  position:relative;z-index:5;display:flex;gap:2px;padding:6px 6px calc(7px + env(safe-area-inset-bottom,0px));
+  position:relative;z-index:5;display:flex;gap:2px;
+  padding:6px calc(6px + var(--sar)) calc(8px + var(--sab)) calc(6px + var(--sal));
   background:linear-gradient(to top,var(--wood2),var(--wood));
   border-top:1px solid #120B05;
 }
 .hinge{
-  flex:1;padding:10px 4px 9px;border:1px solid #16100A;border-radius:2px;
+  flex:1;padding:11px 4px 10px;min-height:52px;border:1px solid #16100A;border-radius:2px;
   background:linear-gradient(to bottom,#2E2013,#1D1409);color:#8B7551;
   font-family:"Grenze Gotisch",serif;font-size:15px;letter-spacing:.05em;text-align:center;
 }
@@ -99,7 +112,8 @@ h1,h2{font-family:"Grenze Gotisch",Georgia,serif;letter-spacing:.01em}
 /* ---------- pergamena ---------- */
 .vellum{background-color:var(--panel);background-repeat:repeat;color:var(--ink)}
 .scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.sheetpage{padding:20px 18px 40px;display:flex;flex-direction:column;gap:26px}
+.sheetpage{padding:20px calc(18px + var(--sar)) calc(44px + var(--sab)) calc(18px + var(--sal));
+  display:flex;flex-direction:column;gap:26px}
 
 .rubric{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
 .rubric h2{font-size:22px;color:var(--rubric);line-height:1}
@@ -199,7 +213,9 @@ select{appearance:none;padding-right:26px;
 .sheet-head{display:flex;align-items:flex-start;gap:12px;padding:15px 17px 12px;
   border-bottom:1px solid rgba(44,31,18,.28);background:rgba(200,175,130,.25)}
 .sheet-head h2{font-size:25px;line-height:1.1;flex:1}
-.sheet-body{overflow-y:auto;padding:16px 17px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:17px}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px calc(17px + var(--sar)) calc(28px + var(--sab)) calc(17px + var(--sal));
+  display:flex;flex-direction:column;gap:17px}
 .sheet-body>*{flex:0 0 auto}
 .sheetpage>*{flex:0 0 auto}
 .xbtn{width:34px;height:34px;border:1px solid rgba(44,31,18,.3);border-radius:2px;display:grid;place-items:center;color:var(--ink2)}
@@ -312,7 +328,8 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .rite p{position:relative;font-family:"UnifrakturMaguntia",serif;font-size:30px;line-height:1.25;margin:0;color:#F0DFB4}
 .rite small{position:relative;color:#B8A272;font-style:italic;font-size:16px}
 
-.empty{position:absolute;left:0;right:0;bottom:24%;text-align:center;padding:0 32px;pointer-events:none}
+.empty{position:absolute;left:0;right:0;bottom:22%;text-align:center;padding:0 32px;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center}
 .empty p{margin:0;font-style:italic;font-size:16.5px;line-height:1.6;color:#C6AF83;text-shadow:0 2px 8px rgba(0,0,0,.9)}
 .empty .lbl{color:#9A855F;margin-bottom:8px}
 
@@ -1221,9 +1238,15 @@ function redraw(){ if(view==="inferno") drawInferno(); else if(view==="paradiso"
 
 /* ===================== interazione mappa ===================== */
 var drag=null;
+var panelRO=null;
 function attachPanel(cv){
   pcv=cv;
   var s=setupCanvas(cv); pctx=s.ctx; bake=null;
+  if(window.ResizeObserver){
+    if(panelRO) panelRO.disconnect();
+    panelRO=new ResizeObserver(function(){ refit(); });
+    panelRO.observe(cv);
+  }
   cv.addEventListener("pointerdown", function(e){
     var rect=cv.getBoundingClientRect(), px=e.clientX-rect.left, py=e.clientY-rect.top;
     for(var i=hits.length-1;i>=0;i--){
@@ -1291,8 +1314,11 @@ function render(){
       (count?"":'<div class="empty"><div class="lbl">'+(view==="inferno"?"Terra deserta":"Cielo vuoto")+'</div><p>'+
         (view==="inferno"
           ? "Nessuna creatura abita ancora l&rsquo;Inferno.<br>Dai un nome a ci&ograve; che ti stringe: prender&agrave; corpo."
-          : "Chi viene liberato sale qui, verso la luce.")+'</p></div>');
+          : "Chi viene liberato sale qui, verso la luce.")+'</p>'+
+        (view==="inferno"?'<button class="btn primary" id="empty-evoca" style="margin-top:16px;pointer-events:auto">Evocare la prima</button>':"")+
+        '</div>');
     attachPanel(el("panel"));
+    if(el("empty-evoca")) el("empty-evoca").onclick=function(){ openForm(null); };
   }
   if(raf) cancelAnimationFrame(raf);
   if(view!=="registro"){ if(reduceMotion) redraw(); else loop(); }
@@ -2261,10 +2287,16 @@ function importBackup(){
 }
 
 /* ===================== avvio ===================== */
-window.addEventListener("resize", function(){
+function refit(){
   if(!pcv||view==="registro") return;
   var s=setupCanvas(pcv); pctx=s.ctx; bake=null; redraw();
-});
+}
+window.addEventListener("resize", refit);
+window.addEventListener("orientationchange", function(){ setTimeout(refit,250); });
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", refit);
+  window.visualViewport.addEventListener("scroll", function(){ window.scrollTo(0,0); });
+}
 document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSheet(); });
 
 loadState();
