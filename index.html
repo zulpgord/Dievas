@@ -113,7 +113,7 @@ h1,h2{font-family:"Grenze Gotisch",Georgia,serif;letter-spacing:.01em}
 .tally{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(44,31,18,.22);border:1px solid rgba(44,31,18,.28)}
 .tally div{background:var(--panel);padding:10px 8px;text-align:center}
 .tally b{display:block;font-family:"Grenze Gotisch",serif;font-size:25px;line-height:1.05;font-weight:400;font-variant-numeric:tabular-nums}
-.tally span{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+.tally span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
 
 .omens{display:flex;flex-direction:column;gap:9px}
 .omen{display:flex;gap:9px;align-items:flex-start;font-size:16px;line-height:1.45}
@@ -250,6 +250,28 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .epithet{font-style:italic;color:var(--ink2);font-size:16px;margin:0}
 
 .portrait{width:100%;max-width:230px;aspect-ratio:1;display:block;margin:0 auto}
+.seg.ground button[aria-pressed="true"][data-g="1"]{border-color:var(--verd);color:#3F5A38;box-shadow:inset 0 0 22px rgba(94,122,84,.2)}
+.seg.ground button[aria-pressed="true"][data-g="0"]{border-color:var(--gold);box-shadow:inset 0 0 22px rgba(195,155,58,.2)}
+.seg.ground button[aria-pressed="true"][data-g="-1"]{border-color:var(--rubric);color:#8C2A15;box-shadow:inset 0 0 22px rgba(158,43,21,.16)}
+.seg.ground button{font-size:15px;line-height:1.15}
+.ledger{display:flex;gap:3px;flex-wrap:wrap;align-items:center}
+.ledger i{width:13px;height:13px;display:block;border:1px solid rgba(44,31,18,.28);font-style:normal}
+.ledger .lg{background:var(--verd)} .ledger .lh{background:var(--gold)} .ledger .ll{background:var(--rubric)}
+.ledger em{font-style:normal;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-left:6px}
+.gbars{display:flex;gap:4px;align-items:stretch;height:104px}
+.gcol{flex:1;display:flex;flex-direction:column;min-width:0}
+.gcol .half{flex:1;display:flex}
+.gcol .half.top{align-items:flex-end}
+.gcol .half.bot{align-items:flex-start}
+.gcol .half span{display:block;width:100%;border-radius:1px}
+.gcol .up{background:linear-gradient(to top,#4E6A45,#7E9A72)}
+.gcol .dn{background:linear-gradient(to bottom,#9E2B15,#C4551D)}
+.gzero{height:1px;background:rgba(44,31,18,.4)}
+.gline{margin-top:8px;font-size:14.5px;display:flex;gap:8px;align-items:baseline}
+.gline .tag{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;flex:none;font-weight:600}
+.gline.g1{color:var(--verd)} .gline.g0{color:#8A6A16} .gline.gm1{color:var(--rubric)}
+.gline span:last-child{color:var(--ink)}
+.warnbox{border-left:3px solid var(--rubric);padding:8px 0 8px 11px;font-size:14.5px;color:var(--ink2);font-style:italic}
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(44,31,18,.24);border:1px solid rgba(44,31,18,.3)}
 .stats3 div{background:rgba(255,250,235,.4);padding:10px;display:flex;flex-direction:column;gap:2px}
 .stats3 b{font-family:"Grenze Gotisch",serif;font-size:21px;font-weight:400;line-height:1;font-variant-numeric:tabular-nums}
@@ -327,6 +349,12 @@ var REGIONS = [
   {k:"fondo",    name:"Lago Senza Fondo",    hint:"vuoto, senso, ignoto",          x:.32, y:.85, r:.13, t:"lake"}
 ];
 var OUTCOMES = ["", "Ha funzionato", "In parte", "Nessun effetto"];
+var GROUND = [
+  {v:1,  label:"Ho fatto lo stesso", short:"terreno tenuto",  ask:"Che cosa hai fatto lo stesso, mentre c\u2019era?"},
+  {v:0,  label:"A met\u00e0",            short:"a met\u00e0",         ask:"Che cosa hai rimandato, e che cosa no?"},
+  {v:-1, label:"Ha deciso lei",     short:"terreno ceduto",  ask:"Che cosa ti ha fatto evitare?"}
+];
+function groundLabel(v){ for(var i=0;i<GROUND.length;i++) if(GROUND[i].v===v) return GROUND[i].short; return ""; }
 var MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 var MESI3 = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
 var GIORNI = ["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
@@ -394,6 +422,69 @@ function trendOf(c){
   var f=e.slice(0,n).reduce(function(a,b){return a+b;},0)/n;
   var l=e.slice(-n).reduce(function(a,b){return a+b;},0)/n;
   return l-f;
+}
+function gOf(e){ return (e&&(e.ground===-1||e.ground===0||e.ground===1))?e.ground:null; }
+function groundEntries(c){ return (c.entries||[]).filter(function(e){ return gOf(e)!==null; }); }
+function gripOf(c){
+  var e=groundEntries(c).slice(-10);
+  if(!e.length) return null;
+  var avg=e.reduce(function(a,b){ return a+b.ground; },0)/e.length;
+  return clamp(Math.round(5.5-4.5*avg),1,10);
+}
+function gripOrPower(c){ var g=gripOf(c); return g==null? lastIntensity(c) : g; }
+function todayEntry(c){
+  var t=todayISO(), es=c.entries||[];
+  for(var i=es.length-1;i>=0;i--) if(String(es[i].date).slice(0,10)===t) return es[i];
+  return null;
+}
+function groundTally(days){
+  var r={won:0,lost:0,half:0};
+  S.creatures.forEach(function(c){ (c.entries||[]).forEach(function(e){
+    if(gOf(e)===null) return;
+    if(daysBetween(e.date,todayISO())>days) return;
+    if(e.ground>0) r.won++; else if(e.ground<0) r.lost++; else r.half++;
+  }); });
+  return r;
+}
+function weeklyGround(){
+  var out=[], now=new Date();
+  for(var wk=9;wk>=0;wk--){
+    var end=new Date(now.getTime()-wk*7*86400000), start=new Date(end.getTime()-6*86400000);
+    var won=0, lost=0;
+    S.creatures.forEach(function(c){ (c.entries||[]).forEach(function(e){
+      if(gOf(e)===null) return;
+      var d=new Date(String(e.date).slice(0,10)+"T12:00:00");
+      if(d>=start&&d<=end){ if(e.ground>0) won++; else if(e.ground<0) lost++; }
+    }); });
+    out.push({won:won,lost:lost,label:MESI3[end.getMonth()]+" "+end.getDate()});
+  }
+  return out;
+}
+function sameThought(c, thought, days){
+  if(!thought||thought.trim().length<8) return 0;
+  var k=thought.trim().toLowerCase().slice(0,30), n=0;
+  (c.entries||[]).forEach(function(e){
+    if(daysBetween(e.date,todayISO())>days) return;
+    var t=e.cbt&&e.cbt.thought?e.cbt.thought.trim().toLowerCase().slice(0,30):"";
+    if(t===k) n++;
+  });
+  return n;
+}
+function topRumination(){
+  var best=null;
+  S.creatures.forEach(function(c){
+    var m={};
+    (c.entries||[]).forEach(function(e){
+      if(daysBetween(e.date,todayISO())>21) return;
+      var t=e.cbt&&e.cbt.thought?e.cbt.thought.trim():"";
+      if(t.length<8) return;
+      var k=t.toLowerCase().slice(0,30);
+      if(!m[k]) m[k]={t:t,n:0};
+      m[k].n++;
+    });
+    Object.keys(m).forEach(function(k){ if(m[k].n>=4&&(!best||m[k].n>best.n)) best={t:m[k].t,n:m[k].n,c:c}; });
+  });
+  return best;
 }
 function allEntries(){
   var out=[];
@@ -1017,7 +1108,9 @@ function drawInferno(){
   living().forEach(function(cr,i){
     var x=cr.x*w, y=cr.y*hh;
     var inten=lastIntensity(cr);
-    var px=(54+inten*5.4)*scale;
+    var grip=gripOf(cr);
+    var shown=(grip==null? inten : grip);
+    var px=(54+shown*5.4)*scale;
     var bob=reduceMotion?0:Math.sin(phase*0.9+i*1.3)*3;
     var sp=spriteFor(cr,px,null);
     c.drawImage(sp, x-px/2, y-px/2+bob, px, px);
@@ -1038,8 +1131,10 @@ function drawInferno(){
     c.fillStyle="rgba(242,228,192,.97)";
     c.fillText(cr.name,lx,ly);
     c.font='600 10.5px "EB Garamond", serif';
-    c.fillStyle= cr.kind==="dievas" ? "rgba(160,200,150,.95)" : "rgba(232,150,80,1)";
-    c.fillText("potenza "+inten, lx, ly+13);
+    c.fillStyle= grip==null
+      ? "rgba(196,178,140,.9)"
+      : (grip>=7 ? "rgba(226,120,70,1)" : (grip<=3 ? "rgba(150,196,140,.95)" : "rgba(214,178,116,.95)"));
+    c.fillText((grip==null? "potenza "+inten : "presa "+grip), lx, ly+13);
     c.restore();
     hits.push({id:cr.id,x:x,y:y+bob,r:Math.max(px*0.45,26)});
   });
@@ -1358,13 +1453,23 @@ function entryHTML(e){
     rit='<div class="ritual">'+(e.ritual.outcome?'<span class="out o'+(oi>0?oi:3)+'">'+esc(e.ritual.outcome)+'</span>':"")+
       '<span>'+esc(e.ritual.what)+'</span></div>';
   }
+  var gr="";
+  if(gOf(e)!==null){
+    var gc = e.ground>0?"g1":(e.ground<0?"gm1":"g0");
+    gr='<div class="gline '+gc+'"><span class="tag">'+esc(groundLabel(e.ground))+'</span>'+
+       (e.groundNote?'<span>'+esc(e.groundNote)+'</span>':'<span></span>')+'</div>';
+  }
   return '<div class="entry '+cls+'"><div class="entry-head"><time>'+fmtDate(e.date)+'</time>'+
     '<span class="pw">potenza '+e.intensity+'</span></div>'+
-    (e.text?'<p>'+esc(e.text)+'</p>':"")+cbt+rit+'</div>';
+    (e.text?'<p>'+esc(e.text)+'</p>':"")+gr+cbt+rit+'</div>';
 }
 function openCreature(id){
   var c=byId(id); if(!c) return;
   var freed=!!c.freed, entries=(c.entries||[]).slice(), inten=lastIntensity(c), tr=trendOf(c);
+  var grip=gripOf(c), tEntry=freed?null:todayEntry(c);
+  var ledger=groundEntries(c).slice(-14).map(function(e){
+    return '<i class="'+(e.ground>0?"lg":(e.ground<0?"ll":"lh"))+'" title="'+fmtDate(e.date)+' · '+esc(groundLabel(e.ground))+'"></i>';
+  }).join("");
   var trTxt=entries.length<2?"—":(tr<=-0.6?"cala":(tr>=0.6?"cresce":"stabile"));
   var kindLabel=freed?"Liberata":(c.kind==="dievas"?"Dievas · ansia":"Demone · paura");
   var kindCls=freed?"k-gold":(c.kind==="dievas"?"k-verd":"k-rub");
@@ -1375,13 +1480,24 @@ function openCreature(id){
   var body=
     '<canvas class="portrait" id="cportrait"></canvas>'+
     '<div class="stats3">'+
-      '<div><b>'+(freed?"✦":inten)+'</b><span>'+(freed?"in cielo":"potenza")+'</span></div>'+
+      '<div><b'+(grip!=null&&grip>=7?' style="color:var(--rubric)"':(grip!=null&&grip<=3?' style="color:var(--verd)"':''))+'>'+
+        (freed?"✦":(grip==null?"—":grip))+'</b><span>'+(freed?"in cielo":"presa")+'</span></div>'+
+      '<div><b>'+inten+'</b><span>potenza</span></div>'+
       '<div><b>'+entries.length+'</b><span>voci</span></div>'+
-      '<div><b style="font-size:17px">'+trTxt+'</b><span>andamento</span></div>'+
     '</div>'+
+    (ledger? '<div class="ledger">'+ledger+'<em>ultimo terreno</em></div>' :
+      '<p class="note">Il <b>terreno</b> è la misura che conta: quanto spesso questa creatura decide che cosa fai. Compare appena registri una voce.</p>')+
     sparkline(entries)+
-    (freed?"":'<div class="field"><div class="lbl">Voce rapida — potenza di oggi</div>'+
-      '<div class="tenner" id="quick">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){ return '<button data-v="'+i+'">'+i+'</button>'; }).join("")+'</div></div>')+
+    (entries.length>1?'<p class="note" style="margin-top:-6px">Potenza nel tempo — quanto forte l’hai sentita: '+trTxt+'. È la misura secondaria.</p>':"")+
+    (!freed&&grip!=null&&grip<=3&&entries.length>=5
+      ? '<div class="warnbox">Non decide quasi più che cosa fai. È il momento in cui il rito ha senso, anche se ogni tanto la senti ancora.</div>' : "")+
+    (freed?"":'<div class="field"><div class="lbl">Voce rapida — due tocchi</div>'+
+      '<div class="tenner" id="quick">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){
+        return '<button data-v="'+i+'"'+((tEntry&&tEntry.intensity===i)||(!tEntry&&inten===i)?' aria-pressed="true"':'')+'>'+i+'</button>'; }).join("")+'</div>'+
+      '<div class="seg ground" id="quickg" style="margin-top:8px">'+GROUND.map(function(g){
+        return '<button data-g="'+g.v+'"'+(tEntry&&tEntry.ground===g.v?' aria-pressed="true"':'')+'>'+esc(g.label)+'</button>'; }).join("")+'</div>'+
+      '<div class="hint">'+(tEntry?"Hai già segnato oggi: tocca di nuovo per correggere."
+        :"Prima la potenza, poi la domanda che conta: oggi ha deciso lei? Si salva da solo.")+'</div></div>')+
     '<dl class="dl">'+
       '<dt>Dominio</dt><dd>'+esc(regionOf(c.region).name)+'</dd>'+
       '<dt>Evocata</dt><dd>'+fmtDate(c.born)+' · '+daysBetween(c.born,todayISO())+' giorni fa</dd>'+
@@ -1407,9 +1523,17 @@ function openCreature(id){
     cv.width=size*dpr; cv.height=size*dpr; cv.style.height=size+"px";
     var cc=cv.getContext("2d"); cc.setTransform(dpr,0,0,dpr,0,0);
     cc.translate(size/2,size*0.45); drawGrotesque(cc,size*0.30,c,freed?"pale":null);
-    var q=sh.querySelector("#quick");
+    var q=sh.querySelector("#quick"), qg=sh.querySelector("#quickg");
+    var pick=(tEntry?tEntry.intensity:inten);
     if(q) q.querySelectorAll("button").forEach(function(b){
-      b.onclick=function(){ quickEntry(c.id, parseInt(b.dataset.v,10)); };
+      b.onclick=function(){
+        pick=parseInt(b.dataset.v,10);
+        q.querySelectorAll("button").forEach(function(x){ x.removeAttribute("aria-pressed"); });
+        b.setAttribute("aria-pressed","true");
+      };
+    });
+    if(qg) qg.querySelectorAll("button").forEach(function(b){
+      b.onclick=function(){ saveQuick(c.id, pick, parseInt(b.dataset.g,10), true); };
     });
     if(sh.querySelector("#c-entry")) sh.querySelector("#c-entry").onclick=function(){ openEntry(c.id); };
     if(sh.querySelector("#c-edit")) sh.querySelector("#c-edit").onclick=function(){ openForm(c.id); };
@@ -1435,26 +1559,46 @@ function pushEntry(c, entry){
   c.intensity=lastIntensity(c);
   clearSprites(); save();
 }
-function quickEntry(id, v){
+function saveQuick(id, pot, ground, reopen){
   var c=byId(id); if(!c) return;
-  pushEntry(c,{id:uid(), date:todayISO(), intensity:v, text:"", quick:true,
-    cbt:{thought:"",pro:"",con:"",reframe:""}, ritual:{what:"",outcome:""}});
-  closeSheet(); render(); openCreature(id);
-  toast("Potenza "+v+" segnata per oggi.");
+  var e=todayEntry(c);
+  if(e){
+    e.intensity=pot; e.ground=ground;
+    c.intensity=lastIntensity(c); clearSprites(); save();
+    toast("Voce di oggi aggiornata.");
+  } else {
+    pushEntry(c,{id:uid(), date:todayISO(), intensity:pot, ground:ground, text:"", groundNote:"", quick:true,
+      cbt:{thought:"",pro:"",con:"",reframe:""}, ritual:{what:"",outcome:""}});
+    toast(ground>0 ? "Terreno tenuto. Segnato."
+        : (ground<0 ? "Segnato: oggi ha deciso lei." : "Segnato: a metà."));
+  }
+  closeSheet(); render();
+  if(reopen) openCreature(id);
 }
 function openEntry(id){
   var c=byId(id); if(!c) return;
   var start=lastIntensity(c);
+  var already=!!todayEntry(c);
   sheet('<div style="flex:1"><span class="kindtag '+(c.kind==="dievas"?"k-verd":"k-rub")+'"><i></i>'+esc(c.name)+'</span>'+
         '<h2 style="margin-top:3px">Nuova voce</h2></div>',
+    (already? '<div class="warnbox">Hai già scritto oggi. Il diario rende di più una volta al giorno, la sera a freddo: annotare mentre la cosa monta la alimenta. Se insisti, questa diventa una seconda voce.</div>' : "")+
     '<div class="row"><div class="field"><div class="lbl">Giorno</div><input type="date" id="e-date" value="'+todayISO()+'"></div></div>'+
-    '<div class="field"><div class="lbl">Potenza oggi</div>'+
+    '<div class="rubric"><h2>Terreno</h2></div>'+
+    '<div class="field"><div class="lbl">Ha deciso lei che cosa facevi?</div>'+
+      '<div class="seg ground" id="e-g">'+GROUND.map(function(g){
+        return '<button data-g="'+g.v+'">'+esc(g.label)+'</button>'; }).join("")+'</div></div>'+
+    '<div class="field"><div class="lbl" id="e-glbl">Che cosa ti ha fatto evitare, o che cosa hai fatto lo stesso</div>'+
+      '<textarea id="e-gnote" rows="2" placeholder="Una riga basta"></textarea>'+
+      '<div class="hint">Questa è la misura che conta: non quanto forte l’hai sentita, ma quanto terreno le hai lasciato.</div></div>'+
+    '<div class="rubric"><h2>Potenza</h2></div>'+
+    '<div class="field"><div class="lbl">Quanto forte, oggi</div>'+
       '<div class="slider"><input type="range" id="e-int" min="1" max="10" value="'+start+'"><span class="val" id="e-intv">'+start+'</span></div></div>'+
     '<div class="field"><div class="lbl">Che cosa è successo</div>'+
       '<textarea id="e-text" rows="4" placeholder="Dove eri, che cosa ha fatto, quanto è durato"></textarea></div>'+
     '<div class="rubric"><h2>Interrogare la bestia</h2></div>'+
     '<p class="note">Facoltativo. Serve a smontare il pensiero, non a giudicarlo.</p>'+
-    '<div class="field"><div class="lbl">Pensiero automatico</div><textarea id="e-th" rows="2" placeholder="La frase esatta che ti ha detto in testa"></textarea></div>'+
+    '<div class="field"><div class="lbl">Pensiero automatico</div><textarea id="e-th" rows="2" placeholder="La frase esatta che ti ha detto in testa"></textarea>'+
+      '<div id="e-rum"></div></div>'+
     '<div class="field"><div class="lbl">Prove a favore</div><textarea id="e-pro" rows="2" placeholder="Che cosa la sostiene davvero"></textarea></div>'+
     '<div class="field"><div class="lbl">Prove contrarie</div><textarea id="e-con" rows="2" placeholder="Che cosa la smentisce"></textarea></div>'+
     '<div class="field"><div class="lbl">Riformulazione</div><textarea id="e-re" rows="2" placeholder="Il pensiero riscritto con onestà"></textarea></div>'+
@@ -1466,13 +1610,30 @@ function openEntry(id){
     function(sh){
       var sl=sh.querySelector("#e-int"), sv=sh.querySelector("#e-intv");
       sl.oninput=function(){ sv.textContent=sl.value; };
+      var gpick=null, glbl=sh.querySelector("#e-glbl");
+      sh.querySelectorAll("#e-g button").forEach(function(b){
+        b.onclick=function(){
+          gpick=parseInt(b.dataset.g,10);
+          sh.querySelectorAll("#e-g button").forEach(function(x){ x.removeAttribute("aria-pressed"); });
+          b.setAttribute("aria-pressed","true");
+          for(var i=0;i<GROUND.length;i++) if(GROUND[i].v===gpick) glbl.textContent=GROUND[i].ask;
+        };
+      });
+      var th=sh.querySelector("#e-th"), rum=sh.querySelector("#e-rum");
+      th.addEventListener("blur", function(){
+        var n=sameThought(c, th.value, 14);
+        rum.innerHTML = n>=3
+          ? '<div class="warnbox" style="margin-top:8px">Questo pensiero l’hai già interrogato '+n+' volte in due settimane. Rismontarlo ogni giorno non è più esame di realtà, è rassicurazione: prova a lasciarlo parlare a vuoto e a registrare solo che cosa hai fatto lo stesso.</div>'
+          : "";
+      });
       sh.querySelector("#e-save").onclick=function(){
         var v=function(q){ return sh.querySelector(q).value.trim(); };
+        if(gpick===null){ toast("Rispondi prima alla domanda sul terreno."); return; }
         var entry={id:uid(), date:sh.querySelector("#e-date").value||todayISO(),
           intensity:parseInt(sl.value,10), text:v("#e-text"),
+          ground:gpick, groundNote:v("#e-gnote"),
           cbt:{thought:v("#e-th"),pro:v("#e-pro"),con:v("#e-con"),reframe:v("#e-re")},
           ritual:{what:v("#e-rit"),outcome:sh.querySelector("#e-out").value}};
-        if(!entry.text&&!entry.cbt.thought&&!entry.ritual.what){ toast("Scrivi almeno una riga."); return; }
         pushEntry(c,entry); closeSheet(); render(); openCreature(c.id);
       };
     });
@@ -1482,7 +1643,8 @@ function openEntry(id){
 function openRite(id){
   var c=byId(id); if(!c) return;
   sheet('<h2>Rito di liberazione</h2>',
-    '<p class="note">La creatura non viene cancellata: cambia natura e sale nell’anta sinistra, col diario intatto. Potrai rileggerla, e riportarla giù se tornasse.</p>'+
+    '<p class="note">Il rito non si compie quando non la senti più — quella condizione può non arrivare mai, e ti lascerebbe creature immortali. Si compie quando <b>non decide più che cosa fai</b>: puoi liberare una bestia che senti ancora forte, se hai smesso di cederle terreno.</p>'+
+    '<p class="note">Non viene cancellata: cambia natura e sale nell’anta sinistra, col diario intatto. Potrai rileggerla, e riportarla giù se tornasse.</p>'+
     '<div class="field"><div class="lbl">Nome celeste</div>'+
       '<input type="text" id="rt-name" maxlength="40" placeholder="Come si chiama ora che non fa più male">'+
       '<div class="hint">Vuoto per tenere «'+esc(c.name)+'».</div></div>'+
@@ -1598,9 +1760,22 @@ function omens(){
     out.push("Ancora pochi segni: con qualche voce in più il registro comincia a parlare.");
     return out;
   }
-  var st=streakInfo(m);
-  if(st.current>=3) out.push("Scrivi da "+st.current+" giorni di fila. Il tuo record è "+st.best+".");
-  else if(all.length){
+  var gt=groundTally(30);
+  if(gt.won+gt.lost+gt.half>=4){
+    out.push("Ultimi trenta giorni: terreno tenuto "+gt.won+" volte, ceduto "+gt.lost+
+      (gt.half?" ("+gt.half+" a metà)":"")+". "+
+      (gt.won>gt.lost ? "La presa sta calando: è il segno che conta."
+       : (gt.lost>gt.won ? "Le stai lasciando strada più di quanta gliene togli."
+          : "Siete in pareggio.")));
+  } else {
+    out.push("Registra il terreno per qualche giorno: è da lì che si capisce se una creatura sta perdendo forza davvero.");
+  }
+  var grippy=null;
+  living().forEach(function(c){ var g=gripOf(c); if(g!=null&&(!grippy||g>grippy.g)) grippy={c:c,g:g}; });
+  if(grippy&&grippy.g>=7) out.push("«"+grippy.c.name+"» è quella che decide di più: presa "+grippy.g+" su 10.");
+  var rum=topRumination();
+  if(rum) out.push("Hai interrogato "+rum.n+" volte lo stesso pensiero («"+rum.t.slice(0,44)+(rum.t.length>44?"…":"")+"»). A quel punto non è più esame di realtà: è rassicurazione.");
+  if(all.length){
     var gap=daysBetween(all[0].e.date, todayISO());
     if(gap>=5) out.push("L’ultima voce risale a "+gap+" giorni fa: il bestiario è fermo.");
   }
@@ -1655,7 +1830,7 @@ function heatColor(avg){
   return "rgb("+r+","+g+","+b+")";
 }
 function renderRegistro(){
-  var m=dayMap(), st=streakInfo(m), all=allEntries();
+  var m=dayMap(), st=streakInfo(m), all=allEntries(), gt30=groundTally(30);
   var totVoci=all.length;
 
   /* calendario: ultime 26 settimane */
@@ -1720,7 +1895,23 @@ function renderRegistro(){
       '<polyline class="ln" points="'+segs.join(" ")+'"/>'+
       wt.map(function(x,i){ return x.avg==null?"":'<circle cx="'+xs(i)+'" cy="'+ys(x.avg)+'" r="2.4" fill="#9E2B15"/>'; }).join("")+
       '</svg><div class="callegend"><span>12 settimane fa</span><span style="margin-left:auto">oggi</span></div>';
-  } else trendHTML='<p class="note">L’andamento generale compare quando ci sono voci in più settimane.</p>';
+  } else trendHTML='<p class="note">Compare quando ci sono voci in più settimane.</p>';
+
+  /* terreno: settimane a barre divergenti */
+  var wg=weeklyGround();
+  var maxG=1; wg.forEach(function(x){ maxG=Math.max(maxG,x.won,x.lost); });
+  var anyG=wg.some(function(x){ return x.won||x.lost; });
+  var groundHTML = anyG
+    ? '<div class="gbars">'+wg.map(function(x){
+        return '<div class="gcol" title="'+esc(x.label)+': +'+x.won+' / -'+x.lost+'">'+
+          '<div class="half top"><span class="up" style="height:'+Math.round(x.won/maxG*100)+'%"></span></div>'+
+          '<div class="gzero"></div>'+
+          '<div class="half bot"><span class="dn" style="height:'+Math.round(x.lost/maxG*100)+'%"></span></div>'+
+        '</div>';
+      }).join("")+'</div>'+
+      '<div class="callegend"><span>10 settimane fa</span><i style="background:#4E6A45"></i><span>tenuto</span>'+
+      '<i style="background:#9E2B15"></i><span>ceduto</span><span style="margin-left:auto">oggi</span></div>'
+    : '<p class="note">Qui comparirà la bilancia vera: sopra la linea le volte in cui hai fatto la cosa lo stesso, sotto quelle in cui la creatura ha deciso per te. Si riempie da sé man mano che scrivi.</p>';
 
   /* elenco creature */
   var pool=S.creatures.filter(function(c){
@@ -1776,7 +1967,7 @@ function renderRegistro(){
           '<div><b>'+living().length+'</b><span>vive</span></div>'+
           '<div><b>'+freedOnes().length+'</b><span>liberate</span></div>'+
           '<div><b>'+totVoci+'</b><span>voci</span></div>'+
-          '<div><b>'+st.current+'</b><span>di fila</span></div>'+
+          '<div><b style="font-size:19px"><span style="color:var(--verd)">+'+gt30.won+'</span> <span style="color:var(--rubric)">\u2212'+gt30.lost+'</span></b><span>terreno 30gg</span></div>'+
         '</div>'+
       '</div>'+
 
@@ -1789,7 +1980,11 @@ function renderRegistro(){
         '<i style="background:'+heatColor(3)+'"></i><i style="background:'+heatColor(6)+'"></i>'+
         '<i style="background:'+heatColor(9)+'"></i><span>tempesta</span></div></section>'+
 
-      '<section><div class="rubric"><h2>Andamento generale</h2></div>'+trendHTML+'</section>'+
+      '<section><div class="rubric"><h2>Terreno</h2></div>'+groundHTML+'</section>'+
+
+      '<section><div class="rubric"><h2>Potenza nel tempo</h2></div>'+
+        '<p class="note" style="margin-bottom:10px">Quanto forte le hai sentite, settimana per settimana. È la misura secondaria: guardala dopo il terreno, non prima.</p>'+
+        trendHTML+'</section>'+
 
       '<section><div class="rubric"><h2>Bilancia dei domini</h2></div><div class="bars">'+barsHTML+'</div></section>'+
 
@@ -1863,17 +2058,27 @@ function renderRegistro(){
 }
 function openQuick(id){
   var c=byId(id); if(!c) return;
+  var te=todayEntry(c), start=te?te.intensity:lastIntensity(c);
   sheet('<h2>'+esc(c.name)+'</h2>',
-    '<div class="field"><div class="lbl">Potenza di oggi</div>'+
-    '<div class="tenner" id="qk">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){ return '<button data-v="'+i+'">'+i+'</button>'; }).join("")+'</div>'+
-    '<div class="hint">Due tocchi e via. Il diario lungo può aspettare.</div></div>',
+    '<div class="field"><div class="lbl">Quanto forte, oggi</div>'+
+      '<div class="tenner" id="qk">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){
+        return '<button data-v="'+i+'"'+(start===i?' aria-pressed="true"':'')+'>'+i+'</button>'; }).join("")+'</div></div>'+
+    '<div class="field"><div class="lbl">Ha deciso lei che cosa facevi?</div>'+
+      '<div class="seg ground" id="qg">'+GROUND.map(function(g){
+        return '<button data-g="'+g.v+'"'+(te&&te.ground===g.v?' aria-pressed="true"':'')+'>'+esc(g.label)+'</button>'; }).join("")+'</div>'+
+      '<div class="hint">'+(te?"Hai già segnato oggi: questo corregge la voce."
+        :"La seconda domanda è quella che conta. Si salva appena rispondi.")+'</div></div>',
     function(sh){
+      var pick=start;
       sh.querySelectorAll("#qk button").forEach(function(b){
         b.onclick=function(){
-          pushEntry(c,{id:uid(),date:todayISO(),intensity:parseInt(b.dataset.v,10),text:"",quick:true,
-            cbt:{thought:"",pro:"",con:"",reframe:""},ritual:{what:"",outcome:""}});
-          closeSheet(); render(); toast("Potenza "+b.dataset.v+" segnata.");
+          pick=parseInt(b.dataset.v,10);
+          sh.querySelectorAll("#qk button").forEach(function(x){ x.removeAttribute("aria-pressed"); });
+          b.setAttribute("aria-pressed","true");
         };
+      });
+      sh.querySelectorAll("#qg button").forEach(function(b){
+        b.onclick=function(){ saveQuick(c.id, pick, parseInt(b.dataset.g,10), false); };
       });
     });
 }
