@@ -200,9 +200,21 @@ select{appearance:none;padding-right:26px;
 
 /* ---------- fogli (sheet) ---------- */
 .scrim{position:absolute;inset:0;z-index:8;background:rgba(10,6,3,.72);animation:fade .2s ease}
+.sheet-body{scroll-padding-bottom:90px}
+.sheet-body input,.sheet-body textarea,.sheet-body select{scroll-margin-top:14px;scroll-margin-bottom:26px}
+.kbbar{position:sticky;bottom:0;z-index:3;display:none;justify-content:flex-end;
+  padding:10px 0 2px;margin:-8px -4px -6px;
+  background:linear-gradient(to top,var(--panel) 55%,rgba(228,211,170,0))}
+.kbbar button{padding:9px 18px;border:1px solid rgba(44,31,18,.4);border-radius:2px;
+  background:linear-gradient(to bottom,#8E3418,#6E2611);color:#F3E2BE;font-family:"Grenze Gotisch",serif;font-size:16px}
+body.kbopen .kbbar{display:flex}
+body.kbopen .sheet-body{padding-bottom:10px}
 @keyframes fade{from{opacity:0}}
 .sheet{
-  position:absolute;left:0;right:0;bottom:0;z-index:9;max-height:93%;
+  position:absolute;left:0;right:0;z-index:9;
+  bottom:var(--kb,0px);
+  max-height:calc(100% - var(--kb,0px) - 16px);
+  transition:bottom .2s ease, max-height .2s ease;
   display:flex;flex-direction:column;color:var(--ink);
   background-color:var(--panel);
   border-top:3px solid var(--wood3);border-radius:3px 3px 0 0;
@@ -287,6 +299,31 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .gline .tag{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;flex:none;font-weight:600}
 .gline.g1{color:var(--verd)} .gline.g0{color:#8A6A16} .gline.gm1{color:var(--rubric)}
 .gline span:last-child{color:var(--ink)}
+.rtable{width:100%;border-collapse:collapse;font-size:14.5px}
+.rtable th{text-align:left;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);
+  font-weight:600;padding:6px 9px 6px 0;border-bottom:1px solid rgba(44,31,18,.32)}
+.rtable td{padding:7px 9px 7px 0;border-bottom:1px solid rgba(44,31,18,.14);vertical-align:top}
+.rtable td.n,.rtable th.n{text-align:right;font-variant-numeric:tabular-nums;padding-right:0}
+.rtable .nm{font-family:"Grenze Gotisch",serif;font-size:16.5px}
+.wrapx{overflow-x:auto}
+.win{color:var(--verd)} .lose{color:var(--rubric)}
+
+.intro{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;
+  background:var(--wood2);color:var(--panel);
+  padding:calc(28px + var(--sat)) 26px calc(24px + var(--sab))}
+.intro .step{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.intro h2{font-family:"UnifrakturMaguntia",serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--gold)}
+.intro p{margin:0;font-size:17.5px;line-height:1.6;color:#DCC9A4}
+.intro p b{color:var(--panel)}
+.intro canvas{width:150px;height:150px;align-self:center}
+.intro .dots{display:flex;gap:7px;justify-content:center;margin-bottom:16px}
+.intro .dots i{width:7px;height:7px;border-radius:50%;background:#54402A;display:block}
+.intro .dots i.on{background:var(--gold)}
+.intro .nav{display:flex;gap:10px}
+.intro .nav button{flex:1;padding:14px;border:1px solid #16100A;border-radius:2px;
+  font-family:"Grenze Gotisch",serif;font-size:18px;background:linear-gradient(to bottom,#6A4E2C,#43301A);color:var(--panel)}
+.intro .nav button.ghost{background:none;color:#9A855F;flex:0 0 auto;padding:14px 18px}
+
 .warnbox{border-left:3px solid var(--rubric);padding:8px 0 8px 11px;font-size:14.5px;color:var(--ink2);font-style:italic}
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(44,31,18,.24);border:1px solid rgba(44,31,18,.3)}
 .stats3 div{background:rgba(255,250,235,.4);padding:10px;display:flex;flex-direction:column;gap:2px}
@@ -938,6 +975,13 @@ function clearSprites(){ sprites={}; }
 
 /* ===================== pannello: Inferno ===================== */
 var pcv=null, pctx=null, bake=null, raf=null, t0=Date.now(), hits=[];
+var VT={s:1,x:0,y:0};
+function resetVT(){ VT.s=1; VT.x=0; VT.y=0; }
+function clampVT(w,hh){
+  VT.s=clamp(VT.s,1,4);
+  VT.x=clamp(VT.x, w-w*VT.s, 0);
+  VT.y=clamp(VT.y, hh-hh*VT.s, 0);
+}
 
 function setupCanvas(cv){
   var dpr=Math.min(window.devicePixelRatio||1,2);
@@ -1117,17 +1161,21 @@ function drawInferno(){
   if(!bake || bake.__w!==w || bake.__h!==hh || bake.__k!=="inf"){
     bake=bakeInferno(w,hh); bake.__w=w; bake.__h=hh; bake.__k="inf";
   }
+  clampVT(w,hh);
   c.clearRect(0,0,w,hh);
-  c.drawImage(bake,0,0,w,hh);
+  c.drawImage(bake, VT.x, VT.y, w*VT.s, hh*VT.s);
 
   hits=[];
+  var plates=[];
   var scale=Math.min(w,hh)/380;
-  living().forEach(function(cr,i){
-    var x=cr.x*w, y=cr.y*hh;
+  var ordered=living().slice().sort(function(a,b){ return gripOrPower(b)-gripOrPower(a); });
+  ordered.forEach(function(cr,i){
+    var x=VT.x+cr.x*w*VT.s, y=VT.y+cr.y*hh*VT.s;
     var inten=lastIntensity(cr);
     var grip=gripOf(cr);
     var shown=(grip==null? inten : grip);
-    var px=(54+shown*5.4)*scale;
+    var px=(54+shown*5.4)*scale*VT.s;
+    if(x<-px||x>w+px||y<-px||y>hh+px){ return; }
     var bob=reduceMotion?0:Math.sin(phase*0.9+i*1.3)*3;
     var sp=spriteFor(cr,px,null);
     c.drawImage(sp, x-px/2, y-px/2+bob, px, px);
@@ -1139,7 +1187,27 @@ function drawInferno(){
     var below=(y+px*0.46+30)<(hh-6);
     var ly=below? y+px*0.44+16+bob : y-px*0.46-14+bob;
     var plateW=Math.max(tw, 74)+18, plateH=32;
-    var plateY=(below? ly-15 : ly-15);
+    var plateY=ly-15;
+    /* etichette che non si accavallano: le creature piu' grandi hanno la precedenza */
+    var rect={x:lx-plateW/2, y:plateY, w:plateW, h:plateH};
+    var hidden=false;
+    if(VT.s<1.6){
+      for(var pi=0;pi<plates.length;pi++){
+        var o=plates[pi];
+        if(rect.x<o.x+o.w && rect.x+rect.w>o.x && rect.y<o.y+o.h && rect.y+rect.h>o.y){ hidden=true; break; }
+      }
+    }
+    if(hidden){
+      c.font='600 10.5px "EB Garamond", serif';
+      c.fillStyle= grip==null ? "rgba(196,178,140,.75)"
+        : (grip>=7 ? "rgba(226,120,70,.9)" : (grip<=3 ? "rgba(150,196,140,.85)" : "rgba(214,178,116,.85)"));
+      c.shadowColor="rgba(0,0,0,.9)"; c.shadowBlur=6;
+      c.fillText((grip==null? inten : grip), lx, below? ly-2 : ly+2);
+      c.restore();
+      hits.push({id:cr.id,x:x,y:y+bob,r:Math.max(px*0.45,26)});
+      return;
+    }
+    plates.push(rect);
     c.fillStyle="rgba(10,6,3,.48)";
     c.beginPath();
     if(c.roundRect) c.roundRect(lx-plateW/2, plateY, plateW, plateH, 3);
@@ -1247,33 +1315,99 @@ function attachPanel(cv){
     panelRO=new ResizeObserver(function(){ refit(); });
     panelRO.observe(cv);
   }
-  cv.addEventListener("pointerdown", function(e){
-    var rect=cv.getBoundingClientRect(), px=e.clientX-rect.left, py=e.clientY-rect.top;
+  var pts={}, gesture=null, lastTap=0;
+  function local(e){ var r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+  function count(){ var n=0; for(var k in pts) if(pts.hasOwnProperty(k)) n++; return n; }
+  function hitAt(p){
     for(var i=hits.length-1;i>=0;i--){
       var g=hits[i];
-      if(Math.hypot(px-g.x,py-g.y)<=g.r){
-        drag={id:g.id,x0:px,y0:py,moved:false};
-        try{ cv.setPointerCapture(e.pointerId); }catch(err){}
-        return;
+      if(Math.hypot(p.x-g.x,p.y-g.y)<=g.r) return g;
+    }
+    return null;
+  }
+  cv.addEventListener("pointerdown", function(e){
+    var p=local(e);
+    pts[e.pointerId]={x:p.x,y:p.y};
+    try{ cv.setPointerCapture(e.pointerId); }catch(err){}
+    if(count()===2){
+      var ids=Object.keys(pts), a=pts[ids[0]], b=pts[ids[1]];
+      gesture={mode:"pinch", d0:Math.hypot(a.x-b.x,a.y-b.y)||1, s0:VT.s,
+        mx:(a.x+b.x)/2, my:(a.y+b.y)/2, x0:VT.x, y0:VT.y};
+      return;
+    }
+    if(count()>2) return;
+    var g=(view==="inferno")?hitAt(p):hitAt(p);
+    if(g) gesture={mode:"drag", id:g.id, x0:p.x, y0:p.y, moved:false};
+    else  gesture={mode:"pan", x0:p.x, y0:p.y, vx:VT.x, vy:VT.y, moved:false};
+  });
+  cv.addEventListener("pointermove", function(e){
+    if(!pts[e.pointerId]) return;
+    var p=local(e);
+    pts[e.pointerId]={x:p.x,y:p.y};
+    if(!gesture) return;
+    var w=cv.clientWidth, hh=cv.clientHeight;
+    if(gesture.mode==="pinch"){
+      var ids=Object.keys(pts); if(ids.length<2) return;
+      var a=pts[ids[0]], b=pts[ids[1]];
+      var d=Math.hypot(a.x-b.x,a.y-b.y)||1;
+      var ns=clamp(gesture.s0*(d/gesture.d0),1,4);
+      /* lo zoom resta ancorato al punto fra le due dita */
+      VT.x=gesture.mx-(gesture.mx-gesture.x0)*(ns/gesture.s0);
+      VT.y=gesture.my-(gesture.my-gesture.y0)*(ns/gesture.s0);
+      VT.s=ns;
+      clampVT(w,hh); redraw();
+      return;
+    }
+    if(gesture.mode==="pan"){
+      if(Math.hypot(p.x-gesture.x0,p.y-gesture.y0)>6) gesture.moved=true;
+      if(VT.s>1.001){
+        VT.x=gesture.vx+(p.x-gesture.x0);
+        VT.y=gesture.vy+(p.y-gesture.y0);
+        clampVT(w,hh); redraw();
+      }
+      return;
+    }
+    if(gesture.mode==="drag" && view==="inferno"){
+      if(Math.hypot(p.x-gesture.x0,p.y-gesture.y0)>7) gesture.moved=true;
+      if(gesture.moved){
+        var cr=byId(gesture.id);
+        if(cr){
+          cr.x=clamp(((p.x-VT.x)/VT.s)/w,.07,.93);
+          cr.y=clamp(((p.y-VT.y)/VT.s)/hh,.08,.92);
+          redraw();
+        }
       }
     }
   });
-  cv.addEventListener("pointermove", function(e){
-    if(!drag||view!=="inferno") return;
-    var rect=cv.getBoundingClientRect(), px=e.clientX-rect.left, py=e.clientY-rect.top;
-    if(Math.hypot(px-drag.x0,py-drag.y0)>7) drag.moved=true;
-    if(drag.moved){
-      var cr=byId(drag.id);
-      if(cr){ cr.x=clamp(px/rect.width,.07,.93); cr.y=clamp(py/rect.height,.08,.92); redraw(); }
-    }
-  });
-  cv.addEventListener("pointerup", function(e){
-    if(!drag) return;
-    var d=drag; drag=null;
+  function endPointer(e){
+    var had=gesture;
+    delete pts[e.pointerId];
     try{ cv.releasePointerCapture(e.pointerId); }catch(err){}
-    if(d.moved) save(); else openCreature(d.id);
-  });
-  cv.addEventListener("pointercancel", function(){ drag=null; });
+    if(!had) return;
+    if(had.mode==="pinch"){ if(count()===0) gesture=null; else gesture=null; return; }
+    if(count()>0){ gesture=null; return; }
+    gesture=null;
+    if(had.mode==="drag"){
+      if(had.moved) save(); else openCreature(had.id);
+      return;
+    }
+    if(had.mode==="pan" && !had.moved){
+      var now=Date.now();
+      if(now-lastTap<320){ resetVT(); redraw(); lastTap=0; }
+      else lastTap=now;
+    }
+  }
+  cv.addEventListener("pointerup", endPointer);
+  cv.addEventListener("pointercancel", function(e){ delete pts[e.pointerId]; gesture=null; });
+  cv.addEventListener("dblclick", function(){ resetVT(); redraw(); });
+  cv.addEventListener("wheel", function(e){
+    e.preventDefault();
+    var p=local(e), w=cv.clientWidth, hh=cv.clientHeight;
+    var ns=clamp(VT.s*(e.deltaY<0?1.12:0.9),1,4);
+    VT.x=p.x-(p.x-VT.x)*(ns/VT.s);
+    VT.y=p.y-(p.y-VT.y)*(ns/VT.s);
+    VT.s=ns; clampVT(w,hh); redraw();
+  }, {passive:false});
 }
 
 /* ===================== struttura ===================== */
@@ -1324,7 +1458,7 @@ function render(){
   if(view!=="registro"){ if(reduceMotion) redraw(); else loop(); }
   applyTextures();
 }
-function go(v){ if(view!==v){ view=v; render(); } }
+function go(v){ if(view!==v){ view=v; resetVT(); render(); } }
 
 /* ===================== fogli ===================== */
 function closeSheet(){
@@ -1339,8 +1473,16 @@ function sheet(titleHTML, bodyHTML, onMount){
   var sh=h('<div class="sheet" role="dialog" aria-modal="true">'+
     '<div class="sheet-head">'+titleHTML+
       '<button class="xbtn" data-close aria-label="Chiudi"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
-    '</div><div class="sheet-body">'+bodyHTML+'</div></div>');
+    '</div><div class="sheet-body">'+bodyHTML+
+      '<div class="kbbar"><button type="button" data-kbdone>Fine</button></div>'+
+    '</div></div>');
+  var kbd=sh.querySelector("[data-kbdone]");
+  if(kbd) kbd.onclick=function(){ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); };
   sh.querySelector("[data-close]").onclick=closeSheet;
+  sh.querySelector(".sheet-head").addEventListener("pointerdown", function(ev){
+    if(ev.target.closest("button")) return;
+    if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+  });
   app.appendChild(scrim); app.appendChild(sh);
   sh.style.backgroundImage="url("+parchmentTile("vellum")+")";
   if(onMount) onMount(sh);
@@ -1367,8 +1509,56 @@ function confirmSheet(title, body, okLabel, onOk){
 /* ===================== evocazione / modifica ===================== */
 function placeIn(regionKey){
   var r=regionOf(regionKey), R=rng(seedOf(regionKey+Date.now()));
-  var a=R()*6.283, d=Math.sqrt(R())*r.r*0.7;
-  return {x:clamp(r.x+Math.cos(a)*d,.1,.9), y:clamp(r.y+Math.sin(a)*d*0.8,.12,.9)};
+  var others=living().map(function(c){ return {x:c.x,y:c.y}; });
+  if(!others.length){
+    var a0=R()*6.283, d0=Math.sqrt(R())*r.r*0.5;
+    return {x:clamp(r.x+Math.cos(a0)*d0,.1,.9), y:clamp(r.y+Math.sin(a0)*d0*0.8,.12,.9)};
+  }
+  var best={x:r.x,y:r.y}, bestD=-1;
+  for(var i=0;i<48;i++){
+    var spread=r.r*(0.5+(i/48)*1.15);            /* se il dominio e' pieno, il cerchio si allarga */
+    var a=R()*6.283, d=Math.sqrt(R())*spread;
+    var x=clamp(r.x+Math.cos(a)*d,.1,.9), y=clamp(r.y+Math.sin(a)*d*0.8,.12,.9);
+    var m=9;
+    for(var j=0;j<others.length;j++){
+      var dd=Math.hypot(others[j].x-x,(others[j].y-y)*0.5);
+      if(dd<m) m=dd;
+    }
+    if(m>bestD){ bestD=m; best={x:x,y:y}; }
+  }
+  return best;
+}
+/* allontana le creature che si toccano, restando dentro la tavola */
+function declutter(){
+  var list=living();
+  if(list.length<2) return false;
+  var w=(pcv&&pcv.clientWidth)||380, hh=(pcv&&pcv.clientHeight)||780;
+  var sc=Math.min(w,hh)/380, moved=false;
+  var pos=list.map(function(c){
+    return {c:c, x:c.x*w, y:c.y*hh, r:(54+gripOrPower(c)*5.4)*sc*0.44};
+  });
+  for(var it=0;it<40;it++){
+    var any=false;
+    for(var i=0;i<pos.length;i++){
+      for(var j=i+1;j<pos.length;j++){
+        var A=pos[i], B=pos[j], dx=B.x-A.x, dy=B.y-A.y, d=Math.hypot(dx,dy);
+        var need=(A.r+B.r)*1.02+14;
+        if(d<0.001){ dx=(j-i); dy=1.3; d=Math.hypot(dx,dy); }
+        if(d<need){
+          var push=(need-d)/2*0.55, ux=dx/d, uy=dy/d;
+          A.x-=ux*push; A.y-=uy*push; B.x+=ux*push; B.y+=uy*push;
+          any=true; moved=true;
+        }
+      }
+    }
+    for(var k=0;k<pos.length;k++){
+      pos[k].x=clamp(pos[k].x, w*0.09, w*0.91);
+      pos[k].y=clamp(pos[k].y, hh*0.10, hh*0.90);
+    }
+    if(!any) break;
+  }
+  if(moved) pos.forEach(function(P){ P.c.x=P.x/w; P.c.y=P.y/hh; });
+  return moved;
 }
 function openForm(id){
   var c=id?byId(id):null;
@@ -1440,7 +1630,7 @@ function openForm(id){
           var p2=placeIn(data.region);
           var nc={id:uid(), seed:seedOf(name), born:todayISO(), x:p2.x, y:p2.y, entries:[], freed:null};
           Object.keys(data).forEach(function(kk){ nc[kk]=data[kk]; });
-          S.creatures.push(nc); save(); closeSheet(); view="inferno"; render();
+          S.creatures.push(nc); declutter(); save(); closeSheet(); view="inferno"; render();
           toast("«"+name+"» ha preso corpo.");
         }
       };
@@ -2026,10 +2216,16 @@ function renderRegistro(){
           '<select id="r-s">'+[["potenza","per potenza"],["recente","per ultima voce"],["nome","per nome"],["dominio","per dominio"]].map(function(o){
             return '<option value="'+o[0]+'"'+(rosterSort===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("")+'</select>'+
         '</div>'+
+        '<div style="height:10px"></div>'+
+        '<div class="btnrow"><button class="btn" id="r-tidy">Riordinare la mappa</button></div>'+
         '<div style="height:10px"></div>'+rosterHTML+
         '<div style="height:12px"></div>'+
         '<div class="btnrow"><button class="btn primary" id="r-new">Evocare una creatura</button></div>'+
       '</section>'+
+
+      '<section><div class="rubric"><h2>Relazione</h2></div>'+
+        '<p class="note" style="margin-bottom:10px">Otto settimane in una pagina sola: terreno, presa, che cosa ha retto, quali parole tornano. Da rileggere, da stampare, o da portare a qualcuno.</p>'+
+        '<div class="btnrow"><button class="btn" id="r-report">Aprire la relazione</button></div></section>'+
 
       '<section><div class="rubric"><h2>Cronaca</h2></div><div class="chron">'+chron+'</div></section>'+
 
@@ -2038,6 +2234,7 @@ function renderRegistro(){
           '<button id="m-seal">Scaricare il tomo intero<small>Un file HTML che contiene l&rsquo;app <em>e</em> tutte le tue creature: si apre da solo, anche senza rete. Il modo pi&ugrave; sicuro di non perdere niente.</small></button>'+
           '<button id="m-export">Esportare un backup<small>Scarica tutto in un file .json</small></button>'+
           '<button id="m-import">Importare un backup<small>Sostituisce i dati di questo dispositivo</small></button>'+
+          '<button id="m-intro">Rivedere la guida<small>Le tre schermate della prima apertura</small></button>'+
         '</div>'+
         '<div style="height:10px"></div>'+
         '<p class="note">I dati vivono in questo browser e non lasciano il telefono: il sito non li vede e non li carica da nessuna parte. Ultimo salvataggio: '+
@@ -2077,9 +2274,17 @@ function renderRegistro(){
   el("r-f").onchange=function(){ rosterFilter=el("r-f").value; renderRegistro(); };
   el("r-s").onchange=function(){ rosterSort=el("r-s").value; renderRegistro(); };
   el("r-new").onclick=function(){ openForm(null); };
+  el("r-tidy").onclick=function(){
+    var moved=declutter();
+    if(moved){ save(); toast("Mappa riordinata: le creature non si coprono pi\u00f9."); }
+    else toast("Nessuna sovrapposizione da sciogliere.");
+    view="inferno"; render();
+  };
   el("m-seal").onclick=sealVolume;
   el("m-export").onclick=exportBackup;
   el("m-import").onclick=importBackup;
+  el("m-intro").onclick=function(){ closeSheet(); showIntro(); };
+  el("r-report").onclick=openReport;
   applyTextures();
 }
 function openQuick(id){
@@ -2216,6 +2421,199 @@ function showCard(cv, c){
     });
 }
 
+/* ===================== relazione ===================== */
+function offerFile(filename, data){
+  var ok=downloadBlob(new Blob([data],{type:"text/html"}), filename);
+  toast(ok? "Relazione scaricata." : "Download non riuscito.");
+  return Promise.resolve(ok);
+}
+
+function reportData(){
+  var days=56, since=new Date(Date.now()-days*86400000);
+  var sinceISO=dISO(since);
+  var rows=[], won=0, lost=0, half=0, sumInt=0, nInt=0;
+  S.creatures.forEach(function(c){
+    var es=(c.entries||[]).filter(function(e){ return String(e.date).slice(0,10)>=sinceISO; });
+    if(!es.length && c.freed && String(c.freed.date).slice(0,10)<sinceISO) return;
+    var w=0,l=0,h=0,si=0;
+    es.forEach(function(e){
+      si+=e.intensity; sumInt+=e.intensity; nInt++;
+      if(gOf(e)===null) return;
+      if(e.ground>0){ w++; won++; } else if(e.ground<0){ l++; lost++; } else { h++; half++; }
+    });
+    rows.push({c:c, n:es.length, won:w, lost:l, half:h,
+      avg: es.length? si/es.length : null,
+      grip: gripOf(c), last: es.length? es[es.length-1].date : null});
+  });
+  rows.sort(function(a,b){ return (b.grip||0)-(a.grip||0); });
+  /* confronto fra i due mesi */
+  var a1=0,n1=0,a2=0,n2=0,g1=0,gc1=0,g2=0,gc2=0;
+  S.creatures.forEach(function(c){ (c.entries||[]).forEach(function(e){
+    var age=daysBetween(e.date,todayISO());
+    if(age<=28){ a1+=e.intensity; n1++; if(gOf(e)!==null){ g1+=e.ground; gc1++; } }
+    else if(age<=56){ a2+=e.intensity; n2++; if(gOf(e)!==null){ g2+=e.ground; gc2++; } }
+  }); });
+  return {
+    sinceISO:sinceISO, rows:rows, won:won, lost:lost, half:half,
+    avgInt: nInt? sumInt/nInt : null, voci:nInt,
+    recent:{int:n1?a1/n1:null, ground:gc1?g1/gc1:null},
+    older:{int:n2?a2/n2:null, ground:gc2?g2/gc2:null},
+    weeks: weeklyGround().slice(2)
+  };
+}
+
+function reportInner(){
+  var d=reportData(), rs=ritualStats().slice(0,5), tw=triggerWords().slice(0,10);
+  var out="";
+  out+='<p class="note">Dal '+fmtLong(d.sinceISO)+' al '+fmtLong(todayISO())+' \u00b7 '+d.voci+' voci di diario.</p>';
+  out+='<div class="tally">'+
+    '<div><b>'+living().length+'</b><span>vive</span></div>'+
+    '<div><b>'+freedOnes().length+'</b><span>liberate</span></div>'+
+    '<div><b class="win">+'+d.won+'</b><span>tenuto</span></div>'+
+    '<div><b class="lose">\u2212'+d.lost+'</b><span>ceduto</span></div>'+
+  '</div>';
+
+  var verdetto;
+  if(d.recent.ground==null||d.older.ground==null){
+    verdetto="Non ci sono ancora due mesi pieni di terreno da confrontare.";
+  } else {
+    var diff=d.recent.ground-d.older.ground;
+    verdetto = Math.abs(diff)<0.15
+      ? "Nel secondo mese il terreno \u00e8 rimasto uguale al primo."
+      : (diff>0
+        ? "Nel secondo mese hai tenuto il terreno pi\u00f9 spesso che nel primo: la presa complessiva sta calando."
+        : "Nel secondo mese hai ceduto pi\u00f9 terreno del primo: qualcosa ha ripreso spazio.");
+    if(d.recent.int!=null&&d.older.int!=null){
+      var di=d.recent.int-d.older.int;
+      verdetto += " La potenza media \u00e8 passata da "+d.older.int.toFixed(1)+" a "+d.recent.int.toFixed(1)+
+        (Math.abs(di)<0.4? " (praticamente ferma)." : ".");
+    }
+  }
+  out+='<div class="rubric"><h2>In breve</h2></div><p class="prose">'+verdetto+'</p>';
+
+  out+='<div class="rubric"><h2>Le creature</h2></div><div class="wrapx"><table class="rtable">'+
+    '<thead><tr><th>Creatura</th><th class="n">Presa</th><th class="n">Potenza</th><th class="n">Voci</th><th class="n">Terreno</th></tr></thead><tbody>';
+  if(!d.rows.length) out+='<tr><td colspan="5">Nessuna voce in questo periodo.</td></tr>';
+  d.rows.forEach(function(r){
+    out+='<tr><td><span class="nm">'+esc(r.c.freed&&r.c.freed.newName?r.c.freed.newName:r.c.name)+'</span><br>'+
+      '<span style="font-size:12.5px;color:var(--ink3)">'+(r.c.freed?"liberata \u00b7 ":"")+
+      (r.c.kind==="dievas"?"dievas":"demone")+' \u00b7 '+esc(regionOf(r.c.region).name)+'</span></td>'+
+      '<td class="n">'+(r.grip==null?"\u2014":r.grip)+'</td>'+
+      '<td class="n">'+(r.avg==null?"\u2014":r.avg.toFixed(1))+'</td>'+
+      '<td class="n">'+r.n+'</td>'+
+      '<td class="n"><span class="win">+'+r.won+'</span> <span class="lose">\u2212'+r.lost+'</span></td></tr>';
+  });
+  out+='</tbody></table></div>';
+
+  out+='<div class="rubric"><h2>Settimana per settimana</h2></div><div class="wrapx"><table class="rtable">'+
+    '<thead><tr><th>Settimana</th><th class="n">Tenuto</th><th class="n">Ceduto</th><th>Bilancia</th></tr></thead><tbody>';
+  d.weeks.forEach(function(wk){
+    var bar="";
+    for(var i=0;i<wk.won;i++) bar+='<span class="win">\u25B2</span>';
+    for(var j=0;j<wk.lost;j++) bar+='<span class="lose">\u25BC</span>';
+    out+='<tr><td>'+esc(wk.label)+'</td><td class="n">'+wk.won+'</td><td class="n">'+wk.lost+'</td><td>'+(bar||"\u2014")+'</td></tr>';
+  });
+  out+='</tbody></table></div>';
+
+  out+='<div class="rubric"><h2>Che cosa ha retto</h2></div>';
+  if(rs.length){
+    out+='<div class="wrapx"><table class="rtable"><thead><tr><th>Rituale</th><th class="n">Volte</th><th class="n">Efficacia</th></tr></thead><tbody>';
+    rs.forEach(function(r){
+      out+='<tr><td>'+esc(r.label)+'</td><td class="n">'+r.n+'</td><td class="n">'+Math.round(r.score/r.n*100)+'%</td></tr>';
+    });
+    out+='</tbody></table></div>';
+  } else out+='<p class="note">Nessun rituale annotato in questo periodo.</p>';
+
+  out+='<div class="rubric"><h2>Parole che tornano</h2></div>';
+  out+= tw.length
+    ? '<p class="prose">'+tw.map(function(x){ return esc(x.w)+" ("+x.n+")"; }).join(" \u00b7 ")+'</p>'
+    : '<p class="note">Ancora poche ripetizioni.</p>';
+  return out;
+}
+
+function reportDoc(){
+  var inner=reportInner();
+  var css='body{margin:0;padding:34px 30px;background:#E4D3AA;color:#2C1F12;'+
+    'font-family:"EB Garamond",Georgia,serif;font-size:16px;line-height:1.55;max-width:760px}'+
+    'h1{font-family:Georgia,serif;font-size:30px;margin:0 0 4px}'+
+    '.sub{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#8A755A;margin-bottom:26px}'+
+    '.rubric{display:flex;align-items:baseline;gap:10px;margin:26px 0 10px}'+
+    '.rubric h2{font-size:21px;color:#9E2B15;margin:0}'+
+    '.rubric::after{content:"";flex:1;height:1px;background:rgba(158,43,21,.35)}'+
+    '.note{font-size:14.5px;color:#5A4630;font-style:italic;margin:0 0 10px}'+
+    '.prose{font-size:16.5px;margin:0}'+
+    '.tally{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(44,31,18,.25);border:1px solid rgba(44,31,18,.3);margin:14px 0}'+
+    '.tally div{background:#EBDCB8;padding:10px;text-align:center}'+
+    '.tally b{display:block;font-size:24px}'+
+    '.tally span{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#8A755A}'+
+    '.rtable{width:100%;border-collapse:collapse;font-size:14.5px}'+
+    '.rtable th{text-align:left;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#8A755A;padding:6px 9px 6px 0;border-bottom:1px solid rgba(44,31,18,.32)}'+
+    '.rtable td{padding:7px 9px 7px 0;border-bottom:1px solid rgba(44,31,18,.14);vertical-align:top}'+
+    '.rtable td.n,.rtable th.n{text-align:right}'+
+    '.nm{font-size:17px}.win{color:#4E6A45}.lose{color:#9E2B15}'+
+    'footer{margin-top:34px;padding-top:14px;border-top:1px solid rgba(44,31,18,.25);font-size:12.5px;color:#8A755A}'+
+    '@media print{body{background:#fff}}';
+  return '<!doctype html><html lang="it"><head><meta charset="utf-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<title>Relazione \u2014 Bestiario dell\u2019Abisso</title><style>'+css+'</style></head><body>'+
+    '<h1>Relazione di otto settimane</h1>'+
+    '<div class="sub">Bestiario dell\u2019Abisso \u00b7 '+fmtLong(todayISO())+'</div>'+
+    inner+
+    '<footer>Diario personale, non un documento clinico. I dati non hanno mai lasciato il dispositivo su cui sono stati scritti.</footer>'+
+    '</body></html>';
+}
+
+function openReport(){
+  sheet('<h2>Relazione di otto settimane</h2>',
+    reportInner()+
+    '<div class="btnrow"><button class="btn primary" id="rp-dl">Scaricare la relazione</button></div>'+
+    '<p class="note">Un file HTML che si apre in qualsiasi browser e si stampa. Diario personale, non un documento clinico.</p>',
+    function(sh){
+      sh.querySelector("#rp-dl").onclick=function(){
+        offerFile("relazione-"+todayISO()+".html", reportDoc());
+      };
+    });
+}
+
+/* ===================== guida ===================== */
+var INTRO_KEY="bestiario.intro.v1";
+function introSeen(){ try{ return localStorage.getItem(INTRO_KEY)==="1"; }catch(e){ return true; } }
+function markIntro(){ try{ localStorage.setItem(INTRO_KEY,"1"); }catch(e){} }
+function showIntro(){
+  var app=document.querySelector(".app"); if(!app) return;
+  var steps=[
+    {t:"Due nature", d:"Le <b>ansie</b> qui si chiamano <b>dievas</b>, le <b>paure</b> <b>demoni</b>. Dai un nome a quello che ti stringe e prende corpo: una bestia disegnata dal nome stesso, che vive in uno dei sei domini dell\u2019Inferno.", k:"dievas", seed:8123},
+    {t:"La misura \u00e8 il terreno", d:"Ogni giorno il diario chiede due cose. Prima <b>se ha deciso lei</b> che cosa facevi: \u00e8 il dato che conta. Poi quanto forte l\u2019hai sentita, che conta molto meno. Da questo nasce la <b>presa</b>, da 1 a 10: le creature che non comandano pi\u00f9 rimpiccioliscono, anche se le senti ancora.", k:"demone", seed:41991},
+    {t:"Tre ante", d:"A destra l\u2019<b>Inferno</b>, dove vivono. Al centro il <b>Registro</b>, dove il custode tiene i conti. A sinistra il <b>Paradiso</b>: quando una creatura non decide pi\u00f9 che cosa fai, il <b>rito di liberazione</b> la manda l\u00e0, con tutto il suo diario intatto.", k:"dievas", seed:70211}
+  ];
+  var i=0;
+  var ov=document.createElement("div");
+  ov.className="intro";
+  app.appendChild(ov);
+  function draw(){
+    var st=steps[i];
+    ov.innerHTML='<div class="step"><canvas width="300" height="300"></canvas>'+
+      '<h2>'+st.t+'</h2><p>'+st.d+'</p></div>'+
+      '<div class="dots">'+steps.map(function(x,j){ return '<i class="'+(j===i?"on":"")+'"></i>'; }).join("")+'</div>'+
+      '<div class="nav">'+(i>0?'<button class="ghost" data-back>Indietro</button>':'<button class="ghost" data-skip>Salta</button>')+
+      '<button data-next>'+(i===steps.length-1?"Comincia":"Avanti")+'</button></div>';
+    var cv=ov.querySelector("canvas");
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    cv.width=150*dpr; cv.height=150*dpr; cv.style.width="150px"; cv.style.height="150px";
+    var cc=cv.getContext("2d"); cc.setTransform(dpr,0,0,dpr,0,0);
+    cc.translate(75,66);
+    drawGrotesque(cc, 44, {id:"i"+i, kind:st.k, seed:st.seed, entries:[], intensity:6}, null);
+    var b=ov.querySelector("[data-back]"), sk=ov.querySelector("[data-skip]");
+    if(b) b.onclick=function(){ i--; draw(); };
+    if(sk) sk.onclick=function(){ markIntro(); ov.remove(); };
+    ov.querySelector("[data-next]").onclick=function(){
+      if(i===steps.length-1){ markIntro(); ov.remove(); }
+      else { i++; draw(); }
+    };
+  }
+  draw();
+}
+
 
 /* ===================== download nel browser ===================== */
 function downloadBlob(blob, filename){
@@ -2245,7 +2643,7 @@ function sealVolume(){
   var doc=buildDocument();
   var ok=downloadBlob(new Blob([doc],{type:"text/html"}), "bestiario-"+todayISO()+".html");
   toast(ok
-    ? "Copia scaricata: e' l'app intera con dentro le tue creature. Si apre anche senza rete."
+    ? "Copia scaricata: è l'app intera con dentro le tue creature. Si apre anche senza rete."
     : "Download non riuscito. Usa l'esportazione del backup.");
 }
 function exportBackup(){
@@ -2287,20 +2685,41 @@ function importBackup(){
 }
 
 /* ===================== avvio ===================== */
+/* altezza della tastiera su iOS: la finestra visibile si accorcia, il layout no */
+function watchKeyboard(){
+  var vv=window.visualViewport;
+  if(!vv) return;
+  function upd(){
+    var kb=Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    if(kb<80) kb=0;
+    document.documentElement.style.setProperty("--kb", kb+"px");
+    document.body.classList.toggle("kbopen", kb>0);
+  }
+  vv.addEventListener("resize", upd);
+  vv.addEventListener("scroll", upd);
+  upd();
+}
+document.addEventListener("focusin", function(e){
+  var t=e.target;
+  if(!t||!/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+  setTimeout(function(){
+    try{ t.scrollIntoView({block:"center", behavior:"smooth"}); }catch(err){}
+  }, 340);
+});
 function refit(){
   if(!pcv||view==="registro") return;
   var s=setupCanvas(pcv); pctx=s.ctx; bake=null; redraw();
 }
 window.addEventListener("resize", refit);
 window.addEventListener("orientationchange", function(){ setTimeout(refit,250); });
-if(window.visualViewport){
-  window.visualViewport.addEventListener("resize", refit);
-  window.visualViewport.addEventListener("scroll", function(){ window.scrollTo(0,0); });
-}
+if(window.visualViewport) window.visualViewport.addEventListener("resize", refit);
+watchKeyboard();
 document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSheet(); });
 
 loadState();
 render();
+if(declutter()) save();
+if(!introSeen()) setTimeout(showIntro, 350);
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ bake=null; redraw(); });
 })();
 </script>
