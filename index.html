@@ -304,6 +304,46 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .gline .tag{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;flex:none;font-weight:600}
 .gline.g1{color:var(--verd)} .gline.g0{color:#8A6A16} .gline.gm1{color:var(--rubric)}
 .gline span:last-child{color:var(--ink)}
+/* bollino di aiuto */
+.q{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-left:7px;
+  border:1px solid rgba(44,31,18,.4);border-radius:50%;font-size:11.5px;line-height:1;color:var(--ink2);
+  background:rgba(255,250,235,.5);vertical-align:middle;font-family:"EB Garamond",serif;font-weight:600;
+  flex:none;padding:0}
+.q:active,.q:hover{background:var(--gold);color:var(--wood2);border-color:var(--gold)}
+.rubric .q{margin-left:2px}
+.panelhead .q{width:26px;height:26px;font-size:15px;border-color:#54402A;background:rgba(84,64,42,.5);color:var(--panel2)}
+
+.tipscrim{position:absolute;inset:0;z-index:12;background:rgba(10,6,3,.55);animation:fade .15s ease}
+.tip{position:absolute;left:12px;right:12px;bottom:calc(16px + var(--sab));z-index:13;
+  max-height:70%;overflow-y:auto;background-color:var(--panel);border:1px solid var(--wood3);
+  border-radius:3px;box-shadow:0 -14px 44px rgba(0,0,0,.6);padding:16px 17px 18px;
+  animation:rise .2s cubic-bezier(.2,.8,.25,1)}
+.tip h3{margin:0 0 8px;font-family:"Grenze Gotisch",serif;font-weight:400;font-size:21px;color:var(--rubric)}
+.tip p{margin:0 0 10px;font-size:16px;line-height:1.55}
+.tip p:last-of-type{margin-bottom:0}
+.tip b{color:var(--ink)}
+.tip .close{margin-top:14px;width:100%;padding:11px;border:1px solid rgba(44,31,18,.35);border-radius:2px;
+  font-family:"Grenze Gotisch",serif;font-size:16px;background:rgba(255,250,235,.5)}
+
+.firststep{border:1px solid rgba(158,43,21,.45);background:rgba(255,250,235,.45);padding:13px 14px;
+  display:flex;flex-direction:column;gap:9px}
+.firststep>b{font-family:"Grenze Gotisch",serif;font-weight:400;font-size:19px;color:var(--rubric);display:block}
+.firststep p b,.firststep li b{font-weight:600;color:var(--ink)}
+.firststep p{margin:0;font-size:15.5px;line-height:1.5}
+.firststep ol{margin:0;padding-left:20px;font-size:15.5px;line-height:1.6}
+.firststep ol li{margin-bottom:4px}
+
+.howto{display:flex;flex-direction:column;gap:14px}
+.step-n{display:flex;gap:12px;align-items:flex-start}
+.step-n .num{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--rubric);color:var(--rubric);
+  display:grid;place-items:center;font-family:"Grenze Gotisch",serif;font-size:15px;margin-top:2px}
+.step-n div p{margin:0;font-size:15.5px;line-height:1.5}
+.step-n>div>b{font-family:"Grenze Gotisch",serif;font-weight:400;font-size:18px;display:block;margin-bottom:2px;color:var(--ink)}
+.step-n p b{font-weight:600;font-size:inherit;font-family:inherit;display:inline;color:var(--ink)}
+.rhythm{width:100%;border-collapse:collapse;font-size:15px}
+.rhythm td{padding:7px 10px 7px 0;border-bottom:1px solid rgba(44,31,18,.16);vertical-align:top}
+.rhythm td:first-child{white-space:nowrap;color:var(--rubric);font-family:"Grenze Gotisch",serif;font-size:16.5px}
+
 .rtable{width:100%;border-collapse:collapse;font-size:14.5px}
 .rtable th{text-align:left;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);
   font-weight:600;padding:6px 9px 6px 0;border-bottom:1px solid rgba(44,31,18,.32)}
@@ -425,9 +465,50 @@ var STOP = ("il lo la i gli le un uno una di a da in con su per tra fra e ed o m
   "quindi perche perché pero però mentre senza sotto sopra dentro fuori verso circa ogni altro altra altri altre "+
   "essere stare stavo sto vado andare viene venire dice dire detto pensare penso solo sola proprio").split(/\s+/);
 
+/* ===================== aiuto ===================== */
+var HELP={
+ natura:{t:"Dievas o demone?",d:"<p><b>Dievas</b> è un’ansia: qualcosa che ti stringe <i>prima</i>, mentre aspetti che accada. <b>Demone</b> è una paura: qualcosa che ti aspetta al varco, con una faccia precisa.</p><p>La differenza non è clinica, è tua. Scegli quella che ti suona giusta: cambia solo il colore della bestia.</p>"},
+ nome:{t:"Perché darle un nome",d:"<p>Nominare è il primo atto utile: mette un confine attorno a quello che senti e lo separa da te. Non sei ansioso, <b>c’è una cosa che si chiama così</b> e ogni tanto arriva.</p><p>Il nome genera anche la figura: cambiandolo, cambia la bestia disegnata.</p>"},
+ dominio:{t:"A che serve il dominio",d:"<p>È il territorio dell’Inferno in cui vive. Serve a vedere <b>da dove arriva la pressione</b>: se col tempo mezzo bestiario finisce nelle Vette del Giudizio, quello è il tema, non le singole creature.</p><p>Puoi sempre spostarla trascinandola sulla mappa.</p>"},
+ trigger:{t:"Ciò che la evoca",d:"<p>Le situazioni in cui compare: luoghi, momenti, persone, orari. Non serve precisione, servono <b>ricorrenze</b>.</p><p>Il Registro le incrocia con le voci di diario e ti mostra le parole che tornano più spesso.</p>"},
+ corpo:{t:"Come ti tocca il corpo",d:"<p>Dove la senti fisicamente: respiro, stomaco, mascella, sonno. Serve a due cose: riconoscerla <b>prima</b> che diventi un pensiero, e accorgerti che il corpo si calma anche quando la testa continua.</p>"},
+ presa:{t:"La presa",d:"<p>Quanto questa creatura <b>decide al posto tuo</b>, da 1 a 10. Si calcola sulle ultime dieci voci: se le cedi terreno sale, se fai le cose lo stesso scende.</p><p>È la misura che governa la sua dimensione sulla mappa, e quella che dice quando il rito di liberazione ha senso. Compare dopo le prime voci.</p>"},
+ potenza:{t:"La potenza",d:"<p>Quanto forte l’hai sentita, da 1 a 10. Serve a riconoscere i picchi e a vedere se col tempo si smorzano.</p><p>Ma <b>non è l’obiettivo</b>: puoi sentirla fortissima e non lasciarle niente. Per questo qui è la misura secondaria — l’ansia non risponde agli ordini, il comportamento sì.</p>"},
+ terreno:{t:"Il terreno",d:"<p>La domanda che conta: <b>oggi ha deciso lei che cosa facevi?</b></p><p><b>Ho fatto lo stesso</b> — hai fatto la cosa mentre c’era. Terreno tenuto.<br><b>A metà</b> — l’hai fatta, ma monca o rimandata.<br><b>Ha deciso lei</b> — hai evitato qualcosa. Terreno ceduto.</p><p>L’evitamento è il carburante dell’ansia: è questo dato, non l’intensità, che dice se una creatura sta perdendo forza.</p>"},
+ vocerapida:{t:"La voce rapida",d:"<p>Il gesto quotidiano: <b>due tocchi, la sera</b>. Prima quanto forte, poi se ha deciso lei.</p><p>Se hai già segnato oggi, il secondo tocco <b>corregge</b> la voce invece di aggiungerne una nuova: una al giorno basta e avanza.</p>"},
+ diario:{t:"La voce lunga",d:"<p>Serve quando è successo qualcosa che vale il racconto: una comparsa forte, una cosa evitata che ti brucia, una che hai fatto e non credevi.</p><p><b>Una o due volte a settimana</b> è il ritmo giusto. Ogni giorno diventa ruminazione scritta.</p><p>Scrivila <b>a freddo, la sera</b>: annotare durante il picco alimenta la bestia invece di guardarla.</p>"},
+ cbt:{t:"Interrogare la bestia",d:"<p>Prendi la frase esatta che ti ha detto in testa e mettila alla prova: cosa la sostiene davvero, cosa la smentisce, come suona riscritta con onestà.</p><p>Funziona <b>una volta</b>. Se rismonti lo stesso pensiero ogni giorno non è più esame di realtà, è rassicurazione compulsiva — e l’app te lo dice.</p>"},
+ rituale:{t:"Il rituale",d:"<p>Che cosa hai fatto per attraversarla — respirazione, uscire, chiamare qualcuno, farla comunque — e se ha retto.</p><p>Dopo qualche settimana il Registro ordina i rituali per efficacia reale: scopri quali funzionano davvero e quali ti raccontavi.</p>"},
+ rito:{t:"Il rito di liberazione",d:"<p>Si compie quando la creatura <b>non decide più che cosa fai</b>, non quando non la senti più: quella condizione può non arrivare mai.</p><p>Puoi liberare una bestia che senti ancora forte, se hai smesso di cederle terreno. Non viene cancellata: sale nel Paradiso con tutto il diario, e puoi riportarla giù se tornasse.</p>"},
+ presagi:{t:"I presagi",d:"<p>Schemi che l’app nota da sola nei tuoi dati: il giorno della settimana peggiore, il dominio più pesante, il rituale che regge, un pensiero rismontato troppe volte, una creatura che dorme da tre settimane.</p><p>Sono osservazioni sui numeri, non diagnosi.</p>"},
+ calendario:{t:"Il calendario",d:"<p>Un quadretto per giorno: si scurisce dove hai scritto, e il colore vira al rosso nei giorni di intensità alta.</p><p>Serve soprattutto a vedere <b>i vuoti</b>: i periodi in cui hai smesso di guardare.</p>"},
+ bilancia:{t:"La bilancia dei domini",d:"<p>Quanto pesa ogni territorio: numero di creature vive e potenza totale.</p><p>Se un dominio domina la barra, il tema vero è quello — e conviene lavorarci lì, non su una bestia alla volta.</p>"},
+ relazione:{t:"La relazione",d:"<p>Otto settimane condensate in una pagina: terreno tenuto e ceduto, presa per creatura, settimana per settimana, cosa ha retto, quali parole tornano.</p><p>Si scarica come pagina da stampare. È un diario personale, non un documento clinico — ma è esattamente il tipo di riepilogo che serve se un giorno ne parli con un terapeuta.</p>"},
+ custodia:{t:"Custodia del tomo",d:"<p>I dati vivono solo in questo browser: nessuno li vede, ma nessuno li salva al posto tuo.</p><p><b>Scaricare il tomo</b> ti dà un file HTML che contiene l’app e le tue creature insieme: si riapre da solo, anche senza rete. Fallo ogni tanto.</p>"}
+};
+function hq(k){ return '<button class="q" data-help="'+k+'" aria-label="Spiegazione">?</button>'; }
+function openTip(k){
+  var h=HELP[k]; if(!h) return;
+  var app=document.querySelector(".app"); if(!app) return;
+  var old=app.querySelector(".tip"), olds=app.querySelector(".tipscrim");
+  if(old) old.remove(); if(olds) olds.remove();
+  var sc=h_el('<div class="tipscrim"></div>');
+  var tp=h_el('<div class="tip" role="dialog"><h3>'+h.t+'</h3>'+h.d+'<button class="close">Ho capito</button></div>');
+  function close(){ sc.remove(); tp.remove(); }
+  sc.onclick=close; tp.querySelector(".close").onclick=close;
+  app.appendChild(sc); app.appendChild(tp);
+}
+document.addEventListener("click", function(e){
+  var b=e.target.closest?e.target.closest("[data-help]"):null;
+  if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  openTip(b.dataset.help);
+}, true);
+
 /* ===================== utilità ===================== */
 function el(id){ return document.getElementById(id); }
 function h(html){ var d=document.createElement("div"); d.innerHTML=html; return d.firstElementChild; }
+function h_el(html){ return h(html); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 function uid(){ return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4); }
@@ -1428,6 +1509,7 @@ function render(){
     '<div class="app">'+
       '<div class="panelhead">'+
         '<h1 class="frak">'+ti.t+'<small>'+ti.s+'</small></h1>'+
+        '<button class="hbtn" id="btn-manual" aria-label="Come si usa">?</button>'+
         (view==="inferno"
           ? '<button class="hbtn" id="btn-evoca" aria-label="Evoca una creatura">+</button>' : "")+
       '</div>'+
@@ -1441,6 +1523,7 @@ function render(){
   el("h-par").onclick=function(){ go("paradiso"); };
   el("h-reg").onclick=function(){ go("registro"); };
   el("h-inf").onclick=function(){ go("inferno"); };
+  el("btn-manual").onclick=openManual;
   if(el("btn-evoca")) el("btn-evoca").onclick=function(){ openForm(null); };
 
   var stage=el("stage");
@@ -1591,23 +1674,23 @@ function openForm(id){
     return '<option value="'+r.k+'"'+(r.k===reg?" selected":"")+'>'+esc(r.name)+' — '+esc(r.hint)+'</option>';
   }).join("");
   sheet('<h2>'+(c?"Emendare la creatura":"Evocare una creatura")+'</h2>',
-    '<div class="field"><div class="lbl">Natura</div>'+
+    '<div class="field"><div class="lbl">Natura'+hq("natura")+'</div>'+
       '<div class="seg" id="f-kind">'+
         '<button class="k-dievas" data-k="dievas" aria-pressed="'+(kind==="dievas")+'">Dievas<small>un’ansia</small></button>'+
         '<button class="k-demone" data-k="demone" aria-pressed="'+(kind==="demone")+'">Demone<small>una paura</small></button>'+
       '</div></div>'+
     '<div id="f-preview" style="display:flex;justify-content:center"></div>'+
-    '<div class="field"><div class="lbl">Nome proprio</div>'+
+    '<div class="field"><div class="lbl">Nome proprio'+hq("nome")+'</div>'+
       '<input type="text" id="f-name" maxlength="40" placeholder="Il Corvo delle Tre" value="'+esc(c?c.name:"")+'">'+
       '<div class="hint">Il nome genera la figura: cambiandolo, cambia la bestia.</div></div>'+
     '<div class="field"><div class="lbl">Aspetto</div>'+
       '<textarea id="f-epithet" rows="2" placeholder="Che forma ha? Come si muove?">'+esc(c?c.epithet:"")+'</textarea></div>'+
-    '<div class="field"><div class="lbl">Dominio</div><select id="f-region">'+regOpts+'</select></div>'+
-    '<div class="field"><div class="lbl">Potenza attuale</div>'+
+    '<div class="field"><div class="lbl">Dominio'+hq("dominio")+'</div><select id="f-region">'+regOpts+'</select></div>'+
+    '<div class="field"><div class="lbl">Potenza attuale'+hq("potenza")+'</div>'+
       '<div class="slider"><input type="range" id="f-int" min="1" max="10" value="'+inten+'"><span class="val" id="f-intv">'+inten+'</span></div></div>'+
-    '<div class="field"><div class="lbl">Ciò che la evoca</div>'+
+    '<div class="field"><div class="lbl">Ciò che la evoca'+hq("trigger")+'</div>'+
       '<textarea id="f-trig" rows="2" placeholder="Situazioni, luoghi, momenti">'+esc(c?c.triggers:"")+'</textarea></div>'+
-    '<div class="field"><div class="lbl">Come ti tocca il corpo</div>'+
+    '<div class="field"><div class="lbl">Come ti tocca il corpo'+hq("corpo")+'</div>'+
       '<textarea id="f-sym" rows="2" placeholder="Respiro, stomaco, mani, sonno">'+esc(c?c.symptoms:"")+'</textarea></div>'+
     '<div class="btnrow"><button class="btn primary" id="f-save">'+(c?"Salva":"Evoca")+'</button></div>',
     function(sh){
@@ -1720,18 +1803,25 @@ function openCreature(id){
   var body=
     '<canvas class="portrait" id="cportrait"></canvas>'+
     '<div class="stats3">'+
-      '<div><b'+(grip!=null&&grip>=7?' style="color:var(--rubric)"':(grip!=null&&grip<=3?' style="color:var(--verd)"':''))+'>'+
-        (freed?"✦":(grip==null?"—":grip))+'</b><span>'+(freed?"in cielo":"presa")+'</span></div>'+
-      '<div><b>'+inten+'</b><span>potenza</span></div>'+
+      '<div data-help="presa"><b'+(grip!=null&&grip>=7?' style="color:var(--rubric)"':(grip!=null&&grip<=3?' style="color:var(--verd)"':''))+'>'+
+        (freed?"✦":(grip==null?"—":grip))+'</b><span>'+(freed?"in cielo":"presa ?")+'</span></div>'+
+      '<div data-help="potenza"><b>'+inten+'</b><span>potenza ?</span></div>'+
       '<div><b>'+entries.length+'</b><span>voci</span></div>'+
     '</div>'+
-    (ledger? '<div class="ledger">'+ledger+'<em>ultimo terreno</em></div>' :
-      '<p class="note">Il <b>terreno</b> è la misura che conta: quanto spesso questa creatura decide che cosa fai. Compare appena registri una voce.</p>')+
+    (ledger? '<div class="ledger">'+ledger+'<em>ultimo terreno</em></div>' : "")+
+    (!freed&&!entries.length
+      ? '<div class="firststep"><b>E adesso?</b>'+
+        '<p>La creatura esiste, ma non sa ancora niente di te. Il lavoro è questo, ed è corto:</p>'+
+        '<ol><li><b>Stasera</b>, prima di dormire, torna qui e usa la <b>voce rapida</b> qui sotto: quanto forte l’hai sentita, e se ha deciso lei che cosa facevi.</li>'+
+        '<li><b>Domani sera</b> lo stesso. Se non si è fatta viva, non segnare niente.</li>'+
+        '<li>Dopo tre o quattro sere comincia a comparire la <b>presa</b>, e il Registro inizia a dirti qualcosa.</li></ol>'+
+        '<p>Una volta a settimana, quando succede qualcosa di grosso, scrivi anche la voce lunga.</p></div>'
+      : "")+
     sparkline(entries)+
     (entries.length>1?'<p class="note" style="margin-top:-6px">Potenza nel tempo — quanto forte l’hai sentita: '+trTxt+'. È la misura secondaria.</p>':"")+
     (!freed&&grip!=null&&grip<=3&&entries.length>=5
       ? '<div class="warnbox">Non decide quasi più che cosa fai. È il momento in cui il rito ha senso, anche se ogni tanto la senti ancora.</div>' : "")+
-    (freed?"":'<div class="field"><div class="lbl">Voce rapida — due tocchi</div>'+
+    (freed?"":'<div class="field"><div class="lbl">Voce rapida — due tocchi'+hq("vocerapida")+'</div>'+
       '<div class="tenner" id="quick">'+[1,2,3,4,5,6,7,8,9,10].map(function(i){
         return '<button data-v="'+i+'"'+((tEntry&&tEntry.intensity===i)||(!tEntry&&inten===i)?' aria-pressed="true"':'')+'>'+i+'</button>'; }).join("")+'</div>'+
       '<div class="seg ground" id="quickg" style="margin-top:8px">'+GROUND.map(function(g){
@@ -1747,13 +1837,14 @@ function openCreature(id){
     '</dl>'+
     (freed&&c.freed.epitaph?'<p class="epithet" style="color:#8A6A16;font-size:17px">“'+esc(c.freed.epitaph)+'”</p>':"")+
     (freed?"":'<div class="btnrow"><button class="btn primary" id="c-entry">Scrivere nel diario</button></div>')+
-    '<div class="rubric"><h2>Diario</h2></div>'+
+    '<div class="rubric"><h2>Diario</h2>'+hq("diario")+'</div>'+
     (entries.length?'<div class="entries">'+entries.slice().reverse().map(entryHTML).join("")+'</div>'
                    :'<p class="note">Nessuna voce. Il diario è il modo in cui la creatura cambia forma.</p>')+
     '<div class="btnrow"><button class="btn" id="c-card">Carta della creatura</button>'+
       (freed?'<button class="btn ghost" id="c-back">Riportala giù</button>'
             :'<button class="btn" id="c-edit">Emendare</button>')+'</div>'+
-    (freed?"":'<div class="btnrow"><button class="btn gold" id="c-free">Rito di liberazione</button></div>')+
+    (freed?"":'<div class="btnrow"><button class="btn gold" id="c-free">Rito di liberazione</button>'+
+      '<button class="btn ghost" data-help="rito" style="flex:0 0 54px">?</button></div>')+
     '<div class="btnrow"><button class="btn danger" id="c-del">Cancellare per sempre</button></div>';
 
   sheet(head, body, function(sh){
@@ -1823,26 +1914,26 @@ function openEntry(id){
         '<h2 style="margin-top:3px">Nuova voce</h2></div>',
     (already? '<div class="warnbox">Hai già scritto oggi. Il diario rende di più una volta al giorno, la sera a freddo: annotare mentre la cosa monta la alimenta. Se insisti, questa diventa una seconda voce.</div>' : "")+
     '<div class="row"><div class="field"><div class="lbl">Giorno</div><input type="date" id="e-date" value="'+todayISO()+'"></div></div>'+
-    '<div class="rubric"><h2>Terreno</h2></div>'+
+    '<div class="rubric"><h2>Terreno</h2>'+hq("terreno")+'</div>'+
     '<div class="field"><div class="lbl">Ha deciso lei che cosa facevi?</div>'+
       '<div class="seg ground" id="e-g">'+GROUND.map(function(g){
         return '<button data-g="'+g.v+'">'+esc(g.label)+'</button>'; }).join("")+'</div></div>'+
     '<div class="field"><div class="lbl" id="e-glbl">Che cosa ti ha fatto evitare, o che cosa hai fatto lo stesso</div>'+
       '<textarea id="e-gnote" rows="2" placeholder="Una riga basta"></textarea>'+
       '<div class="hint">Questa è la misura che conta: non quanto forte l’hai sentita, ma quanto terreno le hai lasciato.</div></div>'+
-    '<div class="rubric"><h2>Potenza</h2></div>'+
+    '<div class="rubric"><h2>Potenza</h2>'+hq("potenza")+'</div>'+
     '<div class="field"><div class="lbl">Quanto forte, oggi</div>'+
       '<div class="slider"><input type="range" id="e-int" min="1" max="10" value="'+start+'"><span class="val" id="e-intv">'+start+'</span></div></div>'+
     '<div class="field"><div class="lbl">Che cosa è successo</div>'+
       '<textarea id="e-text" rows="4" placeholder="Dove eri, che cosa ha fatto, quanto è durato"></textarea></div>'+
-    '<div class="rubric"><h2>Interrogare la bestia</h2></div>'+
+    '<div class="rubric"><h2>Interrogare la bestia</h2>'+hq("cbt")+'</div>'+
     '<p class="note">Facoltativo. Serve a smontare il pensiero, non a giudicarlo.</p>'+
     '<div class="field"><div class="lbl">Pensiero automatico</div><textarea id="e-th" rows="2" placeholder="La frase esatta che ti ha detto in testa"></textarea>'+
       '<div id="e-rum"></div></div>'+
     '<div class="field"><div class="lbl">Prove a favore</div><textarea id="e-pro" rows="2" placeholder="Che cosa la sostiene davvero"></textarea></div>'+
     '<div class="field"><div class="lbl">Prove contrarie</div><textarea id="e-con" rows="2" placeholder="Che cosa la smentisce"></textarea></div>'+
     '<div class="field"><div class="lbl">Riformulazione</div><textarea id="e-re" rows="2" placeholder="Il pensiero riscritto con onestà"></textarea></div>'+
-    '<div class="rubric"><h2>Rituale</h2></div>'+
+    '<div class="rubric"><h2>Rituale</h2>'+hq("rituale")+'</div>'+
     '<div class="field"><div class="lbl">Che cosa hai fatto</div><textarea id="e-rit" rows="2" placeholder="Respirazione, uscita, chiamata, esposizione…"></textarea></div>'+
     '<div class="field"><div class="lbl">Esito</div><select id="e-out">'+
       OUTCOMES.map(function(o,i){ return '<option value="'+esc(o)+'">'+(i===0?"—":esc(o))+'</option>'; }).join("")+'</select></div>'+
@@ -1882,7 +1973,7 @@ function openEntry(id){
 /* ===================== rito ===================== */
 function openRite(id){
   var c=byId(id); if(!c) return;
-  sheet('<h2>Rito di liberazione</h2>',
+  sheet('<h2>Rito di liberazione'+hq("rito")+'</h2>',
     '<p class="note">Il rito non si compie quando non la senti più — quella condizione può non arrivare mai, e ti lascerebbe creature immortali. Si compie quando <b>non decide più che cosa fai</b>: puoi liberare una bestia che senti ancora forte, se hai smesso di cederle terreno.</p>'+
     '<p class="note">Non viene cancellata: cambia natura e sale nell’anta sinistra, col diario intatto. Potrai rileggerla, e riportarla giù se tornasse.</p>'+
     '<div class="field"><div class="lbl">Nome celeste</div>'+
@@ -2211,26 +2302,30 @@ function renderRegistro(){
         '</div>'+
       '</div>'+
 
-      '<section><div class="rubric"><h2>Presagi</h2></div>'+
+      '<section><div class="rubric"><h2>Come si usa</h2></div>'+
+        '<p class="note" style="margin-bottom:10px">Cinque passi, il ritmo giusto e a che cosa serve davvero il diario.</p>'+
+        '<div class="btnrow"><button class="btn" id="r-manual">Aprire il manuale</button></div></section>'+
+
+      '<section><div class="rubric"><h2>Presagi</h2>'+hq("presagi")+'</div>'+
         '<div class="omens">'+omens().map(function(o){ return '<div class="omen">'+esc(o)+'</div>'; }).join("")+'</div></section>'+
 
-      '<section><div class="rubric"><h2>Calendario delle apparizioni</h2></div>'+
+      '<section><div class="rubric"><h2>Calendario delle apparizioni</h2>'+hq("calendario")+'</div>'+
         '<div class="cal">'+calHTML+'</div>'+
         '<div class="callegend"><span>quieto</span><i style="background:'+heatColor(null)+'"></i>'+
         '<i style="background:'+heatColor(3)+'"></i><i style="background:'+heatColor(6)+'"></i>'+
         '<i style="background:'+heatColor(9)+'"></i><span>tempesta</span></div></section>'+
 
-      '<section><div class="rubric"><h2>Terreno</h2></div>'+groundHTML+'</section>'+
+      '<section><div class="rubric"><h2>Terreno</h2>'+hq("terreno")+'</div>'+groundHTML+'</section>'+
 
-      '<section><div class="rubric"><h2>Potenza nel tempo</h2></div>'+
+      '<section><div class="rubric"><h2>Potenza nel tempo</h2>'+hq("potenza")+'</div>'+
         '<p class="note" style="margin-bottom:10px">Quanto forte le hai sentite, settimana per settimana. È la misura secondaria: guardala dopo il terreno, non prima.</p>'+
         trendHTML+'</section>'+
 
-      '<section><div class="rubric"><h2>Bilancia dei domini</h2></div><div class="bars">'+barsHTML+'</div></section>'+
+      '<section><div class="rubric"><h2>Bilancia dei domini</h2>'+hq("bilancia")+'</div><div class="bars">'+barsHTML+'</div></section>'+
 
-      '<section><div class="rubric"><h2>Efficacia dei rituali</h2></div><div class="rites">'+ritesHTML+'</div></section>'+
+      '<section><div class="rubric"><h2>Efficacia dei rituali</h2>'+hq("rituale")+'</div><div class="rites">'+ritesHTML+'</div></section>'+
 
-      '<section><div class="rubric"><h2>Trigger ricorrenti</h2></div>'+cloudHTML+'</section>'+
+      '<section><div class="rubric"><h2>Trigger ricorrenti</h2>'+hq("trigger")+'</div>'+cloudHTML+'</section>'+
 
       '<section><div class="rubric"><h2>Le creature</h2></div>'+
         '<div class="tools">'+
@@ -2247,13 +2342,13 @@ function renderRegistro(){
         '<div class="btnrow"><button class="btn primary" id="r-new">Evocare una creatura</button></div>'+
       '</section>'+
 
-      '<section><div class="rubric"><h2>Relazione</h2></div>'+
+      '<section><div class="rubric"><h2>Relazione</h2>'+hq("relazione")+'</div>'+
         '<p class="note" style="margin-bottom:10px">Otto settimane in una pagina sola: terreno, presa, che cosa ha retto, quali parole tornano. Da rileggere, da stampare, o da portare a qualcuno.</p>'+
         '<div class="btnrow"><button class="btn" id="r-report">Aprire la relazione</button></div></section>'+
 
       '<section><div class="rubric"><h2>Cronaca</h2></div><div class="chron">'+chron+'</div></section>'+
 
-      '<section><div class="rubric"><h2>Custodia del tomo</h2></div>'+
+      '<section><div class="rubric"><h2>Custodia del tomo</h2>'+hq("custodia")+'</div>'+
         '<div class="menu">'+
           '<button id="m-seal">Scaricare il tomo intero<small>Un file HTML che contiene l&rsquo;app <em>e</em> tutte le tue creature: si apre da solo, anche senza rete. Il modo pi&ugrave; sicuro di non perdere niente.</small></button>'+
           '<button id="m-export">Esportare un backup<small>Scarica tutto in un file .json</small></button>'+
@@ -2309,6 +2404,7 @@ function renderRegistro(){
   el("m-import").onclick=importBackup;
   el("m-intro").onclick=function(){ closeSheet(); showIntro(); };
   el("r-report").onclick=openReport;
+  el("r-manual").onclick=openManual;
   applyTextures();
 }
 function openQuick(id){
@@ -2599,6 +2695,46 @@ function openReport(){
     });
 }
 
+/* ===================== manuale ===================== */
+function openManual(){
+  sheet('<h2>Come si usa</h2>',
+    '<p class="note">Il bestiario funziona con un gesto piccolo ripetuto, non con sessioni lunghe. Sono cinque passi.</p>'+
+    '<div class="howto">'+
+      '<div class="step-n"><span class="num">1</span><div><b>Dai un nome</b>'+
+        '<p>Quando riconosci una cosa che torna, evocala: nome, aspetto, dominio, che cosa la fa comparire. Nominarla la separa da te — non sei tu, è una bestia che ogni tanto arriva.</p></div></div>'+
+      '<div class="step-n"><span class="num">2</span><div><b>Segna ogni sera, due tocchi</b>'+
+        '<p>Apri la creatura e usa la <b>voce rapida</b>: quanto forte l’hai sentita, e soprattutto se <b>ha deciso lei</b> che cosa facevi. Trenta secondi. È il gesto che tiene in piedi tutto il resto: senza questo l’app non ha niente da dirti.</p></div></div>'+
+      '<div class="step-n"><span class="num">3</span><div><b>Racconta quando serve</b>'+
+        '<p>Una o due volte a settimana, quando è successo qualcosa che vale il racconto, scrivi la <b>voce lunga</b>: che cosa è accaduto, il pensiero esatto, come l’hai smontato, che rituale hai provato. A freddo, la sera — mai durante il picco.</p></div></div>'+
+      '<div class="step-n"><span class="num">4</span><div><b>Leggi il Registro una volta a settimana</b>'+
+        '<p>Non i singoli giorni: i <b>presagi</b> e la bilancia del <b>terreno</b>. È lì che si vede se stai riprendendo spazio o se lo stai cedendo, cosa ti fa da innesco e quali rituali reggono davvero.</p></div></div>'+
+      '<div class="step-n"><span class="num">5</span><div><b>Libera quando non comanda più</b>'+
+        '<p>Quando la <b>presa</b> scende a 3 o meno, l’app te lo dice. Compi il rito: la creatura sale nel Paradiso col suo diario intatto. Non serve che tu abbia smesso di sentirla — serve che abbia smesso di decidere.</p></div></div>'+
+    '</div>'+
+
+    '<div class="rubric"><h2>Il ritmo</h2></div>'+
+    '<table class="rhythm"><tbody>'+
+      '<tr><td>Ogni sera</td><td>Voce rapida: due tocchi per ogni creatura che si è fatta viva. Se non si è vista, non segnare niente.</td></tr>'+
+      '<tr><td>1–2 volte<br>a settimana</td><td>Una voce lunga, sulla creatura che ha fatto più rumore.</td></tr>'+
+      '<tr><td>Una volta<br>a settimana</td><td>Cinque minuti nel Registro: presagi e terreno.</td></tr>'+
+      '<tr><td>Ogni due mesi</td><td>La relazione di otto settimane. E un backup del tomo.</td></tr>'+
+      '<tr><td>Quando serve</td><td>Il rito, se la presa è scesa. Una nuova evocazione, se compare una bestia nuova.</td></tr>'+
+    '</tbody></table>'+
+
+    '<div class="rubric"><h2>A che serve il diario</h2></div>'+
+    '<p class="prose">A tre cose, in ordine di importanza. <b>Vedere l’evitamento</b>: nel momento non ti accorgi di stare rinunciando a qualcosa, a distanza di settimane invece si conta. <b>Rendere la bestia una cosa esterna</b>, con un nome e una faccia, invece di uno stato d’animo che sei tu. <b>Accorgerti dei cambiamenti lenti</b>: nessuno ricorda com’era due mesi fa, i numeri sì.</p>'+
+    '<p class="note">Quello che il diario non fa: farla passare mentre la scrivi. Se ti accorgi di scrivere <i>durante</i> l’ansia per calmarti, stai usando l’app come rassicurazione — chiudila e scrivi stasera.</p>'+
+
+    '<div class="rubric"><h2>Le tre ante</h2></div>'+
+    '<p class="prose"><b>Inferno</b> (destra): la mappa delle creature vive. Pizzica per ingrandire, trascina una bestia per spostarla, toccala per aprirla.<br>'+
+    '<b>Registro</b> (centro): i conti del custode, l’elenco completo, la relazione, i backup.<br>'+
+    '<b>Paradiso</b> (sinistra): chi è stato liberato, che resta leggibile per sempre.</p>'+
+    '<div class="btnrow"><button class="btn" id="mn-intro">Rivedere il tutorial</button></div>',
+    function(sh){
+      sh.querySelector("#mn-intro").onclick=function(){ closeSheet(); showIntro(); };
+    });
+}
+
 /* ===================== guida ===================== */
 var INTRO_KEY="bestiario.intro.v1";
 function introSeen(){ try{ return localStorage.getItem(INTRO_KEY)==="1"; }catch(e){ return true; } }
@@ -2606,9 +2742,18 @@ function markIntro(){ try{ localStorage.setItem(INTRO_KEY,"1"); }catch(e){} }
 function showIntro(){
   var app=document.querySelector(".app"); if(!app) return;
   var steps=[
-    {t:"Due nature", d:"Le <b>ansie</b> qui si chiamano <b>dievas</b>, le <b>paure</b> <b>demoni</b>. Dai un nome a quello che ti stringe e prende corpo: una bestia disegnata dal nome stesso, che vive in uno dei sei domini dell\u2019Inferno.", k:"dievas", seed:8123},
-    {t:"La misura \u00e8 il terreno", d:"Ogni giorno il diario chiede due cose. Prima <b>se ha deciso lei</b> che cosa facevi: \u00e8 il dato che conta. Poi quanto forte l\u2019hai sentita, che conta molto meno. Da questo nasce la <b>presa</b>, da 1 a 10: le creature che non comandano pi\u00f9 rimpiccioliscono, anche se le senti ancora.", k:"demone", seed:41991},
-    {t:"Tre ante", d:"A destra l\u2019<b>Inferno</b>, dove vivono. Al centro il <b>Registro</b>, dove il custode tiene i conti. A sinistra il <b>Paradiso</b>: quando una creatura non decide pi\u00f9 che cosa fai, il <b>rito di liberazione</b> la manda l\u00e0, con tutto il suo diario intatto.", k:"dievas", seed:70211}
+    {t:"Due nature", k:"dievas", seed:8123,
+     d:"Le <b>ansie</b> qui si chiamano <b>dievas</b>, le <b>paure</b> <b>demoni</b>. Dai un nome a quello che ti stringe e prende corpo: una bestia disegnata dal nome stesso, che va ad abitare uno dei sei domini dell’Inferno."},
+    {t:"Perché nominarla", k:"demone", seed:41991,
+     d:"Finché è «l’ansia», sei tu. Quando ha un nome, una faccia e un territorio, diventa <b>una cosa che ogni tanto arriva</b> — e su una cosa esterna si può tenere il conto. È tutto qui il trucco."},
+    {t:"Ogni sera, due tocchi", k:"dievas", seed:70211,
+     d:"Il gesto quotidiano è corto: apri la creatura che si è fatta viva e usa la <b>voce rapida</b>. Quanto forte l’hai sentita, e poi la domanda che conta. Trenta secondi. Se una bestia non si è vista, non segnare niente."},
+    {t:"La domanda che conta", k:"demone", seed:33517,
+     d:"<b>Oggi ha deciso lei che cosa facevi?</b> Se hai fatto la cosa lo stesso, hai <b>tenuto il terreno</b>. Se hai evitato qualcosa, gliel’hai <b>ceduto</b>. È questo — non quanto forte la senti — che dice se sta perdendo forza: da qui nasce la <b>presa</b>, da 1 a 10, che governa quanto è grande sulla mappa."},
+    {t:"Quando raccontare", k:"dievas", seed:59003,
+     d:"Una o due volte a settimana, quando succede qualcosa che vale il racconto, scrivi la <b>voce lunga</b>: cosa è accaduto, la frase esatta che ti ha detto in testa, come l’hai smontata, che rituale hai provato e se ha retto. A freddo, la sera: scrivere durante il picco la alimenta."},
+    {t:"Le tre ante", k:"demone", seed:11777,
+     d:"A destra l’<b>Inferno</b>, dove vivono. Al centro il <b>Registro</b>, che tiene i conti e ti dice cosa vede. A sinistra il <b>Paradiso</b>: quando una creatura non decide più che cosa fai, il <b>rito</b> la manda là — col diario intatto, e con la possibilità di riportarla giù."}
   ];
   var i=0;
   var ov=document.createElement("div");
@@ -2620,7 +2765,7 @@ function showIntro(){
       '<h2>'+st.t+'</h2><p>'+st.d+'</p></div>'+
       '<div class="dots">'+steps.map(function(x,j){ return '<i class="'+(j===i?"on":"")+'"></i>'; }).join("")+'</div>'+
       '<div class="nav">'+(i>0?'<button class="ghost" data-back>Indietro</button>':'<button class="ghost" data-skip>Salta</button>')+
-      '<button data-next>'+(i===steps.length-1?"Comincia":"Avanti")+'</button></div>';
+      '<button data-next>'+(i===steps.length-1?(living().length?"Comincia":"Evoca la prima"):"Avanti")+'</button></div>';
     var cv=ov.querySelector("canvas");
     var dpr=Math.min(window.devicePixelRatio||1,2);
     cv.width=150*dpr; cv.height=150*dpr; cv.style.width="150px"; cv.style.height="150px";
@@ -2631,7 +2776,10 @@ function showIntro(){
     if(b) b.onclick=function(){ i--; draw(); };
     if(sk) sk.onclick=function(){ markIntro(); ov.remove(); };
     ov.querySelector("[data-next]").onclick=function(){
-      if(i===steps.length-1){ markIntro(); ov.remove(); }
+      if(i===steps.length-1){
+        markIntro(); ov.remove();
+        if(!living().length){ view="inferno"; render(); setTimeout(function(){ openForm(null); }, 250); }
+      }
       else { i++; draw(); }
     };
   }
