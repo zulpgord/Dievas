@@ -476,6 +476,12 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:88px;z-index:30;
   background:var(--wood);border:1px solid #16100A;padding:9px 15px;color:var(--panel);
   font-size:14.5px;box-shadow:0 8px 26px rgba(0,0,0,.6);animation:fade .2s;max-width:88%;text-align:center}
+.bkbar{position:absolute;left:12px;right:12px;top:10px;z-index:6;display:flex;align-items:center;gap:10px;
+  background:var(--wood);border:1px solid #16100A;padding:9px 10px 9px 13px;color:var(--panel);
+  font-size:14.5px;line-height:1.3;box-shadow:0 8px 26px rgba(0,0,0,.6);animation:fade .2s}
+.bkbar p{margin:0;flex:1}
+.bkbar button{flex:none;padding:7px 11px;font-size:14px;color:var(--panel);background:transparent;border:1px solid rgba(228,211,170,.35)}
+.bkbar button.go{background:var(--rubric);border-color:#5E180B;color:#F6E9CC}
 .menu{display:flex;flex-direction:column;border:1px solid rgba(44,31,18,.3)}
 .menu button{padding:12px 13px;text-align:left;border-bottom:1px solid rgba(44,31,18,.18);background:rgba(255,250,235,.3);font-size:16.5px}
 .menu button:last-child{border-bottom:none}
@@ -661,7 +667,7 @@ function loadState(){
 }
 function save(){
   S.updated=new Date().toISOString();
-  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); askPersist(); }
   catch(e){ toast(L("Salvataggio non riuscito: memoria del browser piena o bloccata.","Save failed: the browser’s storage is full or blocked.")); }
 }
 function byId(id){ for(var i=0;i<S.creatures.length;i++) if(S.creatures[i].id===id) return S.creatures[i]; return null; }
@@ -1741,6 +1747,7 @@ function render(){
   if(raf) cancelAnimationFrame(raf);
   if(view!=="registro"){ if(reduceMotion) redraw(); else loop(); }
   applyTextures();
+  showBackupBar();
 }
 function go(v){ if(view!==v){ view=v; resetVT(); render(); } }
 
@@ -3388,14 +3395,66 @@ function buildDocument(){
 function sealVolume(){
   var doc=buildDocument();
   var ok=downloadBlob(new Blob([doc],{type:"text/html"}), "bestiario-"+todayISO()+".html");
+  if(ok) markBackup();
   toast(ok
     ? L("Copia scaricata: è l'app intera con dentro le tue creature. Si apre anche senza rete.","Copy downloaded: it’s the whole app with your creatures inside. It opens offline too.")
     : L("Download non riuscito. Usa l'esportazione del backup.","Download failed. Use the backup export instead."));
 }
 function exportBackup(){
   var name="bestiario-"+todayISO()+".json", data=JSON.stringify(S,null,2);
-  if(downloadBlob(new Blob([data],{type:"application/json"}), name)) toast(L("Backup scaricato.","Backup downloaded."));
+  var blob=new Blob([data],{type:"application/json"});
+  /* sul telefono: menu di condivisione, così il file finisce in File/iCloud/Drive */
+  var file=null;
+  try{ file=new File([blob], name, {type:"application/json"}); }catch(e){}
+  if(file && navigator.canShare && navigator.share && /Android|iPhone|iPad|iPod/.test(navigator.userAgent) && navigator.canShare({files:[file]})){
+    navigator.share({files:[file], title:TITLE}).then(function(){
+      markBackup(); toast(L("Backup salvato.","Backup saved."));
+    }).catch(function(err){
+      if(err && err.name==="AbortError") return;
+      if(downloadBlob(blob, name)){ markBackup(); toast(L("Backup scaricato.","Backup downloaded.")); } else showRaw(data);
+    });
+    return;
+  }
+  if(downloadBlob(blob, name)){ markBackup(); toast(L("Backup scaricato.","Backup downloaded.")); }
   else showRaw(data);
+}
+
+/* ===================== promemoria di backup ===================== */
+var BK_KEY="bestiario.backup.v1", BK_DAYS=7, BK_SNOOZE=3;
+function bkState(){
+  var o=null; try{ o=JSON.parse(localStorage.getItem(BK_KEY)||"null"); }catch(e){}
+  if(!o||typeof o!=="object") o={};
+  if(!o.since){ o.since=new Date().toISOString(); bkWrite(o); }
+  return o;
+}
+function bkWrite(o){ try{ localStorage.setItem(BK_KEY, JSON.stringify(o)); }catch(e){} }
+function markBackup(){ var o=bkState(); o.last=new Date().toISOString(); o.snooze=null; bkWrite(o); hideBackupBar(); }
+function backupDue(){
+  if(!S.creatures.length) return false;
+  var o=bkState(), now=Date.now(), DAY=86400000;
+  if(o.last && new Date(S.updated||0)<=new Date(o.last)) return false;
+  if(o.snooze && now<new Date(o.snooze).getTime()) return false;
+  return now-new Date(o.last||o.since).getTime() > BK_DAYS*DAY;
+}
+function hideBackupBar(){ var b=document.querySelector(".bkbar"); if(b) b.remove(); }
+function showBackupBar(){
+  hideBackupBar();
+  if(view==="registro"||!backupDue()) return;
+  var stage=el("stage"); if(!stage) return;
+  var o=bkState();
+  var bar=h('<div class="bkbar" role="status"><p>'+
+    (o.last ? L("Ultima copia di sicurezza: ","Last safety copy: ")+esc(fmtDate(o.last))+"."
+            : L("Non hai ancora una copia di sicurezza.","You don&rsquo;t have a safety copy yet."))+
+    '</p><button id="bk-later">'+L("Più tardi","Later")+'</button><button class="go" id="bk-go">'+L("Salva copia","Save copy")+'</button></div>');
+  stage.appendChild(bar);
+  el("bk-later").onclick=function(){ o.snooze=new Date(Date.now()+BK_SNOOZE*86400000).toISOString(); bkWrite(o); hideBackupBar(); };
+  el("bk-go").onclick=exportBackup;
+}
+/* chiede al browser di non cancellare i dati da solo quando lo spazio scarseggia */
+var persistAsked=false;
+function askPersist(){
+  if(persistAsked||!S.creatures.length) return; persistAsked=true;
+  try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(function(p){ if(!p) navigator.storage.persist(); }).catch(function(){}); }catch(e){}
 }
 function showRaw(data){
   sheet('<h2>Backup</h2>',
@@ -3464,6 +3523,7 @@ document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeShee
 
 try{ document.title=TITLE; }catch(e){}
 loadState();
+askPersist();
 render();
 if(declutter()) save();
 if(!introSeen()) setTimeout(showIntro, 350);
