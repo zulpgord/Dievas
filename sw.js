@@ -1,5 +1,5 @@
 /* Bestiario dell'Abisso — service worker: funziona offline, la pagina si aggiorna appena c'è rete. */
-var CACHE = "bestiario-v1";
+var CACHE = "bestiario-v2";
 var CORE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {
