@@ -4,9 +4,21 @@ Diario per dare un nome alle proprie ansie e paure e trasformarle in creature: l
 
 ## Come è fatta
 
-- Un solo file: `index.html`, senza build, server o dipendenze (solo i font Google, opzionali).
+- L'app è tutta in `index.html`, senza build, server o dipendenze (solo i font Google, opzionali). Funziona anche aperta come file.
+- `manifest.webmanifest`, `sw.js` e `icons/` la rendono installabile sul telefono e utilizzabile offline quando è servita dal sito (GitHub Pages: https://zulpgord.github.io/Dievas/).
 - I dati restano nel browser (`localStorage`, chiave `bestiario.abisso.v1`). Nulla viene inviato in rete.
 - Backup: dal Registro → *Custodia del tomo* si scarica un `.json` oppure il "tomo intero" (l'app con dentro i dati).
+
+## Funzioni principali
+
+- Creature con nome, dominio, trigger, sintomi e "che cosa faresti se non ci fosse".
+- Voce rapida serale (potenza + terreno tenuto/ceduto) e rassegna serale.
+- Sfide a gradini con paura prevista/reale e verifica della previsione.
+- Modo notte (rimandare il rimuginio) e pagina "Se stai male adesso" con numeri di emergenza e ascolto.
+- Termometro mensile GAD-7 (questionario standard, uso libero).
+- Le funzioni si rivelano per gradi (3 voci → sfide, 10 voci → Registro completo); "Mostrare tutto subito" nel Registro.
+- Promemoria serale come evento ricorrente nel calendario (.ics), con link `?rassegna=1`.
+- Promemoria di backup dopo 7 giorni, condivisione del backup su telefono.
 
 ## Lingue
 

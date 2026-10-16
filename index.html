@@ -10,6 +10,8 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <title>Bestiario dell'Abisso</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Grenze+Gotisch:wght@400;600;800&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 <style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -476,6 +478,25 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:88px;z-index:30;
   background:var(--wood);border:1px solid #16100A;padding:9px 15px;color:var(--panel);
   font-size:14.5px;box-shadow:0 8px 26px rgba(0,0,0,.6);animation:fade .2s;max-width:88%;text-align:center}
+.sosbox{border:1px solid rgba(158,43,21,.45);background:rgba(158,43,21,.08);padding:12px 14px;color:inherit}
+.sosbox>b{display:block;font-family:"Grenze Gotisch",serif;font-weight:400;font-size:17px;color:var(--rubric);margin-top:6px}
+.sosbox>b:first-child{margin-top:0}
+.sosbox p{margin:4px 0 8px}
+.sosbox a{color:var(--rubric);font-weight:600}
+.sheet.night .sosbox>b,.sheet.night .sosbox a{color:#E9A27A}
+.sos-link{background:none;border:0;color:inherit;text-decoration:underline;font:inherit;padding:4px;cursor:pointer}
+.gadopts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.gadopts button{padding:8px 6px;font-size:14px;line-height:1.2;border:1px solid rgba(44,31,18,.3);background:rgba(255,250,235,.35);color:var(--ink2)}
+.gadopts button[aria-pressed="true"]{background:var(--rubric);border-color:#5E180B;color:#F6E9CC}
+.field.gad .lbl{text-transform:none;letter-spacing:0;font-size:15.5px;color:var(--ink)}
+.tm-hist{display:flex;align-items:flex-end;gap:6px;height:90px;margin:10px 0 6px}
+.tm-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.tm-col span{display:block;width:70%;min-height:3px}
+.tm-col i{font-style:normal;font-size:11px;color:var(--ink3);margin-top:3px;white-space:nowrap}
+.duedot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rubric);vertical-align:middle;margin-left:4px}
+input[type=time]{font:inherit;font-size:18px;padding:8px 10px;border:1px solid rgba(44,31,18,.3);background:rgba(255,250,235,.5);color:var(--ink)}
+html.plain *{font-family:"EB Garamond",Georgia,serif!important}
+html.plain h1,html.plain h2,html.plain .frak{font-weight:600}
 .bkbar{position:absolute;left:12px;right:12px;top:10px;z-index:6;display:flex;align-items:center;gap:10px;
   background:var(--wood);border:1px solid #16100A;padding:9px 10px 9px 13px;color:var(--panel);
   font-size:14.5px;line-height:1.3;box-shadow:0 8px 26px rgba(0,0,0,.6);animation:fade .2s}
@@ -526,6 +547,13 @@ document.documentElement.lang=window.__LANG;
 /* testi: L(italiano, inglese) sceglie in base alla lingua attiva */
 var EN = window.__LANG==="en";
 function L(it,en){ return EN?en:it; }
+var PLAIN_KEY="bestiario.plain.v1";
+function plainOn(){ try{ return localStorage.getItem(PLAIN_KEY)==="1"; }catch(e){ return false; } }
+function setPlain(on){
+  try{ localStorage.setItem(PLAIN_KEY, on?"1":"0"); }catch(e){}
+  document.documentElement.classList.toggle("plain", on);
+}
+document.documentElement.classList.toggle("plain", plainOn());
 function switchLang(){
   try{ localStorage.setItem("bestiario.lang", EN?"it":"en"); }catch(e){}
   location.reload();
@@ -598,6 +626,8 @@ var HELP={
  calendario:{t:L("Il calendario","The calendar"),d:L("<p>Un quadretto per giorno: si scurisce dove hai scritto, e il colore vira al rosso nei giorni di intensità alta.</p><p>Serve soprattutto a vedere <b>i vuoti</b>: i periodi in cui hai smesso di guardare.</p>","<p>One square per day: it darkens where you wrote, and the colour turns red on high-intensity days.</p><p>Mostly it’s there to show the <b>gaps</b>: the stretches when you stopped looking.</p>")},
  bilancia:{t:L("La bilancia dei domini","The balance of domains"),d:L("<p>Quanto pesa ogni territorio: numero di creature vive e potenza totale.</p><p>Se un dominio domina la barra, il tema vero è quello — e conviene lavorarci lì, non su una bestia alla volta.</p>","<p>How much each territory weighs: number of living creatures and total power.</p><p>If one domain dominates the bar, that’s the real theme — and it’s worth working there, rather than one beast at a time.</p>")},
  relazione:{t:L("La relazione","The report"),d:L("<p>Otto settimane condensate in una pagina: terreno tenuto e ceduto, presa per creatura, settimana per settimana, cosa ha retto, quali parole tornano.</p><p>Si scarica come pagina da stampare. È un diario personale, non un documento clinico — ma è esattamente il tipo di riepilogo che serve se un giorno ne parli con un terapeuta.</p>","<p>Eight weeks condensed into a single page: ground held and given up, grip per creature, week by week, what held, which words keep coming back.</p><p>It downloads as a printable page. It’s a personal diary, not a clinical document — but it’s exactly the kind of summary that helps if one day you talk it through with a therapist.</p>")},
+ valori:{t:L("Che cosa faresti se non ci fosse","What you would do if it weren\u2019t there"),d:L("<p>La domanda che sposta lo sguardo dalla paura a <b>quello che ti sta togliendo</b>. Non serve una risposta solenne: una cena, una telefonata, un viaggio, dire di no a qualcuno.</p><p>Te la ricordo quando lanci una sfida: affrontarla non serve a dimostrare niente, serve a riprenderti quella cosa.</p>","<p>The question that shifts your eyes from the fear to <b>what it is taking from you</b>. It needn\u2019t be a solemn answer: a dinner, a phone call, a trip, saying no to someone.</p><p>I remind you of it when you set a challenge: facing it isn\u2019t about proving anything, it\u2019s about taking that thing back.</p>")},
+ termometro:{t:L("Il termometro","The thermometer"),d:L("<p>Sette domande standard (il <b>GAD-7</b>) sull\u2019ansia in generale nelle ultime due settimane. Punteggio da 0 a 21: sotto 5 minima, 5\u20139 lieve, 10\u201314 moderata, 15 e oltre grave.</p><p>Le creature dicono <i>dove</i> l\u2019ansia ti prende; il termometro dice se, nel complesso, sta calando. Una volta al mese basta. Non è una diagnosi.</p>","<p>Seven standard questions (the <b>GAD-7</b>) about anxiety in general over the last two weeks. Score from 0 to 21: under 5 minimal, 5\u20139 mild, 10\u201314 moderate, 15 and over severe.</p><p>The creatures say <i>where</i> anxiety grabs you; the thermometer says whether, overall, it\u2019s coming down. Once a month is enough. It isn\u2019t a diagnosis.</p>")},
  costo:{t:L("Che cosa ti costa","What it costs you"),d:L("<p>Le aree della tua vita su cui questa creatura mette le mani. Ogni volta che le cedi terreno, il conto si segna lì.</p><p>Serve a trasformare un numero in un motivo: <b>«ceduto 9 volte»</b> dice poco, <b>«ti è costata tre cene, due palestre e una telefonata»</b> dice tutto.</p>","<p>The areas of your life this creature gets its hands on. Every time you give it ground, the cost is charged there.</p><p>It turns a number into a reason: <b>«given up 9 times»</b> says little, <b>«it cost you three dinners, two workouts and one phone call»</b> says everything.</p>")},
  sfida:{t:L("Le sfide","Challenges"),d:L("<p>Registrare l’evitamento serve a vederlo. <b>Disfarlo</b> è un’altra cosa: scegli una cosa che la creatura ti ha fatto evitare, fissa quando la fai, e dichiara prima <b>quanto temi che sia brutta</b>, da 1 a 10.</p><p>Dopo segni com’è andata e quanto è stata brutta <i>davvero</i>. Quasi sempre il numero reale è più basso di quello temuto: è questa distanza, ripetuta, che smonta una paura — molto più del ragionarci sopra.</p><p>Una sfida per volta, piccola abbastanza da farla.</p>","<p>Recording avoidance lets you see it. <b>Undoing it</b> is another matter: pick something the creature made you avoid, set a date for doing it, and declare up front <b>how bad you expect it to be</b>, from 1 to 10.</p><p>Afterwards you record how it went and how bad it <i>actually</i> was. Almost always the real number is lower than the feared one: that gap, repeated, is what dismantles a fear — far more than reasoning about it.</p><p>One challenge at a time, small enough that you’ll actually do it.</p>")},
  tempesta:{t:L("Terreno sotto tempesta","Ground under storm"),d:L("<p>Aver fatto la cosa in un giorno in cui la sentivi <b>7 o più</b>. Vale il doppio: andarci quando è tranquillo non insegna niente al sistema di allarme, andarci quando urla sì.</p><p>Nel registro delle tessere lo trovi in oro.</p>","<p>Having done the thing on a day you felt it at <b>7 or more</b>. It counts double: going when it’s quiet teaches the alarm system nothing, going when it’s screaming does.</p><p>In the row of tiles you’ll find those in gold.</p>")},
@@ -663,7 +693,7 @@ function loadState(){
   } else if(local&&local.creatures&&local.creatures.length) pick=local;
   else if(embedded&&embedded.creatures&&embedded.creatures.length) pick=embedded;
   else pick=local||embedded;
-  if(pick&&pick.creatures) S={v:1, creatures:pick.creatures, parked:pick.parked||[], updated:pick.updated||null};
+  if(pick&&pick.creatures) S={v:1, creatures:pick.creatures, parked:pick.parked||[], checks:pick.checks||[], updated:pick.updated||null};
 }
 function save(){
   S.updated=new Date().toISOString();
@@ -755,6 +785,11 @@ function allChallenges(){
   S.creatures.forEach(function(c){ chalsOf(c).forEach(function(x){ out.push({x:x,c:c}); }); });
   return out;
 }
+function predStats(){
+  var r={n:0,no:0};
+  S.creatures.forEach(function(c){ chalsOf(c).forEach(function(x){ if(x.predHappened){ r.n++; if(x.predHappened==="no") r.no++; } }); });
+  return r;
+}
 function chalStats(){
   var done=0, tot=0, fear=0, real=0, n=0;
   allChallenges().forEach(function(o){
@@ -817,6 +852,33 @@ function parkThought(txt, cid){
 function releaseParked(id, done){
   (S.parked||[]).forEach(function(p){ if(p.id===id) p.done=!!done; });
   save();
+}
+/* il bestiario si rivela per gradi: all'inizio solo nome e voce rapida */
+var REVEAL_KEY="bestiario.reveal.v1", REVEAL_SEEN="bestiario.revealseen.v1";
+function revealAll(){ try{ return localStorage.getItem(REVEAL_KEY)==="all"; }catch(e){ return false; } }
+function revealLevel(){
+  if(revealAll()) return 3;
+  var n=0, first=null, chals=false;
+  S.creatures.forEach(function(c){
+    n+=(c.entries||[]).length;
+    if(c.born&&(!first||c.born<first)) first=c.born;
+    if(chalsOf(c).length) chals=true;
+  });
+  var d=first?daysBetween(first,todayISO()):0;
+  if(n>=10||d>=14) return 3;
+  if(n>=3||d>=4||chals) return 2;
+  return 1;
+}
+function revealNews(){
+  var lv=revealLevel(), seen=0;
+  try{ seen=parseInt(localStorage.getItem(REVEAL_SEEN)||"0",10)||0; }catch(e){}
+  if(lv===seen) return;
+  try{ localStorage.setItem(REVEAL_SEEN,String(lv)); }catch(e){}
+  if(!seen||lv<seen||revealAll()) return;
+  setTimeout(function(){
+    toast(lv===2 ? L("Il bestiario si rivela: ora puoi lanciare sfide e interrogare la bestia nella voce lunga.","The bestiary reveals more: you can now set challenges and question the beast in the long entry.")
+                 : L("Il Registro si è aperto del tutto: calendario, rituali, trigger e la relazione.","The Ledger has opened fully: calendar, rituals, triggers and the report."));
+  }, 500);
 }
 function allEntries(){
   var out=[];
@@ -1692,9 +1754,9 @@ function attachPanel(cv){
 function render(){
   var root=el("root");
   var titles={
-    inferno:{t:L("L'Inferno","The Inferno"), s:living().length? living().length+L(" creature vive"," living creatures") : L("nessuna creatura","no creatures")},
+    inferno:{t:L("L'Inferno","The Inferno"), s:living().length? living().length+(living().length===1?L(" creatura viva"," living creature"):L(" creature vive"," living creatures")) : L("nessuna creatura","no creatures")},
     registro:{t:L("Il Registro","The Ledger"), s:L("mano del custode","the keeper’s hand")},
-    paradiso:{t:L("Il Paradiso","Paradise"), s:freedOnes().length? freedOnes().length+" liberate" : L("nessuna liberata","none released")}
+    paradiso:{t:L("Il Paradiso","Paradise"), s:freedOnes().length? freedOnes().length+(freedOnes().length===1?L(" liberata"," released"):L(" liberate"," released")) : L("nessuna liberata","none released")}
   };
   var ti=titles[view];
   root.innerHTML=
@@ -1748,6 +1810,7 @@ function render(){
   if(view!=="registro"){ if(reduceMotion) redraw(); else loop(); }
   applyTextures();
   showBackupBar();
+  revealNews();
 }
 function go(v){ if(view!==v){ view=v; resetVT(); render(); } }
 
@@ -1895,6 +1958,8 @@ function openForm(id){
       L('<textarea id="f-trig" rows="2" placeholder="Situazioni, luoghi, momenti">','<textarea id="f-trig" rows="2" placeholder="Situations, places, moments">')+esc(c?c.triggers:"")+'</textarea></div>'+
     L('<div class="field"><div class="lbl">Come ti tocca il corpo','<div class="field"><div class="lbl">How it touches your body')+hq("corpo")+'</div>'+
       L('<textarea id="f-sym" rows="2" placeholder="Respiro, stomaco, mani, sonno">','<textarea id="f-sym" rows="2" placeholder="Breath, stomach, hands, sleep">')+esc(c?c.symptoms:"")+'</textarea></div>'+
+    L('<div class="field"><div class="lbl">Che cosa faresti se non ci fosse','<div class="field"><div class="lbl">What you would do if it weren\u2019t there')+hq("valori")+'</div>'+
+      L('<textarea id="f-val" rows="2" placeholder="Andrei alla cena di venerdì, chiederei quell\u2019aumento">','<textarea id="f-val" rows="2" placeholder="I\u2019d go to Friday\u2019s dinner, I\u2019d ask for that raise">')+esc(c?c.values:"")+'</textarea></div>'+
     L('<div class="field"><div class="lbl">Che cosa ti costa','<div class="field"><div class="lbl">What it costs you')+hq("costo")+'</div>'+
       '<div class="chips" id="f-cost">'+AREAS.map(function(a){
         var on=c&&c.cost&&c.cost.indexOf(a.k)>=0;
@@ -1942,7 +2007,8 @@ function openForm(id){
           region:sh.querySelector("#f-region").value,
           intensity:parseInt(sl.value,10),
           triggers:sh.querySelector("#f-trig").value.trim(),
-          symptoms:sh.querySelector("#f-sym").value.trim() };
+          symptoms:sh.querySelector("#f-sym").value.trim(),
+          values:sh.querySelector("#f-val").value.trim() };
         if(c){
           if(c.region!==data.region){ var p=placeIn(data.region); c.x=p.x; c.y=p.y; }
           Object.keys(data).forEach(function(kk){ c[kk]=data[kk]; });
@@ -2013,8 +2079,11 @@ function openCreature(id){
   var chals=chalsOf(c).slice().sort(function(a,b){
     if(!a.outcome&&b.outcome) return -1;
     if(a.outcome&&!b.outcome) return 1;
-    return a.due<b.due?1:-1;
+    if(!a.outcome) return a.fear-b.fear;
+    return (a.closedAt||a.due)<(b.closedAt||b.due)?1:-1;
   });
+  var openN=chals.filter(function(x){ return !x.outcome; }).length;
+  var nextStep=nextRung(c);
   var trTxt=entries.length<2?"—":(tr<=-0.6?L("cala","falling"):(tr>=0.6?L("cresce","rising"):L("stabile","steady")));
   var kindLabel=freed?L("Liberata","Released"):(c.kind==="dievas"?L("Dievas · ansia","Dievas · anxiety"):L("Demone · paura","Demon · fear"));
   var kindCls=freed?"k-gold":(c.kind==="dievas"?"k-verd":"k-rub");
@@ -2060,13 +2129,16 @@ function openCreature(id){
       L('<dt>Evocata</dt><dd>','<dt>Summoned</dt><dd>')+fmtDate(c.born)+' · '+daysBetween(c.born,todayISO())+L(' giorni fa</dd>',' days ago</dd>')+
       (c.triggers?L('<dt>La evoca</dt><dd>','<dt>Summoned by</dt><dd>')+esc(c.triggers)+'</dd>':"")+
       (c.symptoms?L('<dt>Nel corpo</dt><dd>','<dt>In the body</dt><dd>')+esc(c.symptoms)+'</dd>':"")+
+      (c.values?L('<dt>Senza di lei</dt><dd>','<dt>Without it</dt><dd>')+esc(c.values)+'</dd>':"")+
       (freed?L('<dt>Liberata</dt><dd>','<dt>Released</dt><dd>')+fmtDate(c.freed.date)+'</dd>':"")+
     '</dl>'+
     (freed&&c.freed.epitaph?'<p class="epithet" style="color:#8A6A16;font-size:17px">“'+esc(c.freed.epitaph)+'”</p>':"")+
     (freed?"":L('<div class="btnrow"><button class="btn primary" id="c-entry">Scrivere nel diario</button></div>','<div class="btnrow"><button class="btn primary" id="c-entry">Write in the diary</button></div>'))+
-    (freed?"":L('<div class="rubric"><h2>Sfide</h2>','<div class="rubric"><h2>Challenges</h2>')+hq("sfida")+'</div>'+
+    (freed||(revealLevel()<2&&!chals.length)?"":L('<div class="rubric"><h2>Sfide</h2>','<div class="rubric"><h2>Challenges</h2>')+hq("sfida")+'</div>'+
+      (openN>1? L('<p class="note">Le sfide aperte sono in ordine di paura, come i gradini di una scala: comincia dal più basso.</p>','<p class="note">Open challenges are ordered by fear, like the rungs of a ladder: start with the lowest.</p>') : "")+
       (chals.length? chals.map(function(x){ return chalHTML(x, c); }).join("")
         : L('<p class="note">Nessuna sfida. Una sfida è una cosa che questa creatura ti fa evitare, e che decidi di fare lo stesso: si dichiara prima quanto temi che sia brutta, e dopo quanto lo è stata davvero.</p>','<p class="note">No challenges. A challenge is something this creature makes you avoid, and that you decide to do anyway: you declare beforehand how bad you expect it to be, and afterwards how bad it really was.</p>'))+
+      (nextStep? L('<div class="firststep" style="margin-top:12px"><b>Il gradino successivo</b><p>Hai affrontato «','<div class="firststep" style="margin-top:12px"><b>The next rung</b><p>You faced «')+esc(nextStep.what)+L('». Il passo che conta adesso è uno un po\u2019 più difficile: una cosa che temi circa ','». The step that counts now is a slightly harder one: something you fear at about ')+nextStep.fear+L('.</p><div class="btnrow"><button class="btn" id="c-next">Fissare il gradino successivo</button></div></div>','.</p><div class="btnrow"><button class="btn" id="c-next">Set the next rung</button></div></div>') : "")+
       L('<div class="btnrow" style="margin-top:12px"><button class="btn primary" id="c-chal">Lanciare una sfida</button></div>','<div class="btnrow" style="margin-top:12px"><button class="btn primary" id="c-chal">Set a challenge</button></div>'))+
     L('<div class="rubric"><h2>Diario</h2>','<div class="rubric"><h2>Diary</h2>')+hq("diario")+'</div>'+
     (entries.length?'<div class="entries">'+entries.slice().reverse().map(entryHTML).join("")+'</div>'
@@ -2099,6 +2171,7 @@ function openCreature(id){
     });
     if(sh.querySelector("#c-entry")) sh.querySelector("#c-entry").onclick=function(){ openEntry(c.id); };
     if(sh.querySelector("#c-chal")) sh.querySelector("#c-chal").onclick=function(){ openChallenge(c.id); };
+    if(sh.querySelector("#c-next")) sh.querySelector("#c-next").onclick=function(){ openChallenge(c.id, nextStep.fear); };
     if(sh.querySelector("#c-free2")) sh.querySelector("#c-free2").onclick=function(){ openRite(c.id); };
     if(sh.querySelector("#c-awake")) sh.querySelector("#c-awake").onclick=function(){
       c.snoozedAt=todayISO(); save(); closeSheet(); render(); openCreature(c.id);
@@ -2172,6 +2245,8 @@ function openEntry(id){
       '<div class="slider"><input type="range" id="e-int" min="1" max="10" value="'+start+'"><span class="val" id="e-intv">'+start+'</span></div></div>'+
     L('<div class="field"><div class="lbl">Che cosa è successo</div>','<div class="field"><div class="lbl">What happened</div>')+
       L('<textarea id="e-text" rows="4" placeholder="Dove eri, che cosa ha fatto, quanto è durato"></textarea></div>','<textarea id="e-text" rows="4" placeholder="Where you were, what it did, how long it lasted"></textarea></div>')+
+    (revealLevel()<2 ? L('<p class="note">Dopo qualche sera, qui compariranno anche le domande per smontare il pensiero e annotare che cosa ti ha aiutato.</p>','<p class="note">After a few evenings, questions for taking the thought apart and noting what helped will appear here too.</p>') : "")+
+    (revealLevel()<2 ? "" :
     L('<div class="rubric"><h2>Interrogare la bestia</h2>','<div class="rubric"><h2>Questioning the beast</h2>')+hq("cbt")+'</div>'+
     L('<p class="note">Facoltativo. Serve a smontare il pensiero, non a giudicarlo.</p>','<p class="note">Optional. It’s for taking the thought apart, not for judging it.</p>')+
     L('<div class="field"><div class="lbl">Pensiero automatico</div><textarea id="e-th" rows="2" placeholder="La frase esatta che ti ha detto in testa"></textarea>','<div class="field"><div class="lbl">Automatic thought</div><textarea id="e-th" rows="2" placeholder="The exact sentence it said in your head"></textarea>')+
@@ -2182,7 +2257,7 @@ function openEntry(id){
     L('<div class="rubric"><h2>Rituale</h2>','<div class="rubric"><h2>Ritual</h2>')+hq("rituale")+'</div>'+
     L('<div class="field"><div class="lbl">Che cosa hai fatto</div><textarea id="e-rit" rows="2" placeholder="Respirazione, uscita, chiamata, esposizione…"></textarea></div>','<div class="field"><div class="lbl">What you did</div><textarea id="e-rit" rows="2" placeholder="Breathing, going out, a phone call, exposure…"></textarea></div>')+
     L('<div class="field"><div class="lbl">Esito</div><select id="e-out">','<div class="field"><div class="lbl">Outcome</div><select id="e-out">')+
-      OUTCOMES.map(function(o,i){ return '<option value="'+esc(o)+'">'+(i===0?"—":esc(o))+'</option>'; }).join("")+'</select></div>'+
+      OUTCOMES.map(function(o,i){ return '<option value="'+esc(o)+'">'+(i===0?"—":esc(o))+'</option>'; }).join("")+'</select></div>')+
     L('<div class="btnrow"><button class="btn primary" id="e-save">Registrare la voce</button></div>','<div class="btnrow"><button class="btn primary" id="e-save">Record the entry</button></div>'),
     function(sh){
       var sl=sh.querySelector("#e-int"), sv=sh.querySelector("#e-intv");
@@ -2197,20 +2272,20 @@ function openEntry(id){
         };
       });
       var th=sh.querySelector("#e-th"), rum=sh.querySelector("#e-rum");
-      th.addEventListener("blur", function(){
+      if(th) th.addEventListener("blur", function(){
         var n=sameThought(c, th.value, 14);
         rum.innerHTML = n>=3
           ? L('<div class="warnbox" style="margin-top:8px">Questo pensiero l’hai già interrogato ','<div class="warnbox" style="margin-top:8px">You’ve already questioned this thought ')+n+L(' volte in due settimane. Rismontarlo ogni giorno non è più esame di realtà, è rassicurazione: prova a lasciarlo parlare a vuoto e a registrare solo che cosa hai fatto lo stesso.</div>',' times in two weeks. Taking it apart every day isn’t reality testing any more, it’s reassurance: try letting it talk to no one, and record only what you did anyway.</div>')
           : "";
       });
       sh.querySelector("#e-save").onclick=function(){
-        var v=function(q){ return sh.querySelector(q).value.trim(); };
+        var v=function(q){ var f=sh.querySelector(q); return f?f.value.trim():""; };
         if(gpick===null){ toast(L("Rispondi prima alla domanda sul terreno.","Answer the ground question first.")); return; }
         var entry={id:uid(), date:sh.querySelector("#e-date").value||todayISO(),
           intensity:parseInt(sl.value,10), text:v("#e-text"),
           ground:gpick, groundNote:v("#e-gnote"),
           cbt:{thought:v("#e-th"),pro:v("#e-pro"),con:v("#e-con"),reframe:v("#e-re")},
-          ritual:{what:v("#e-rit"),outcome:sh.querySelector("#e-out").value}};
+          ritual:{what:v("#e-rit"),outcome:v("#e-out")}};
         pushEntry(c,entry); closeSheet(); render(); openCreature(c.id);
       };
     });
@@ -2232,7 +2307,7 @@ function openRassegna(){
     if(i>=queue.length){ finish(); return; }
     var c=queue[i], pick=lastIntensity(c);
     var dots=queue.map(function(x,j){ return '<i class="'+(j<i?"ok":(j===i?"on":""))+'"></i>'; }).join("");
-    sheet('<div style="flex:1"><span class="kindtag '+(c.kind==="dievas"?"k-verd":"k-rub")+L('"><i></i>Rassegna ','"><i></i>Round ')+(i+1)+' di '+queue.length+'</span>'+
+    sheet('<div style="flex:1"><span class="kindtag '+(c.kind==="dievas"?"k-verd":"k-rub")+L('"><i></i>Rassegna ','"><i></i>Round ')+(i+1)+L(' di ',' of ')+queue.length+'</span>'+
           L('<h2 style="margin-top:3px">Stasera</h2></div>','<h2 style="margin-top:3px">Tonight</h2></div>'),
       '<div class="rass">'+
         '<canvas id="ra-p"></canvas>'+
@@ -2296,6 +2371,24 @@ function openRassegna(){
   step();
 }
 
+/* ===================== se stai male adesso ===================== */
+/* numeri verificati a ottobre 2026: 112 (emergenza UE), Telefono Amico Italia 02 2327 2327, WhatsApp 324 011 7252 */
+function helpBoxHTML(){
+  return '<div class="sosbox">'+
+    L('<b>Se sei in pericolo o pensi di farti del male</b>','<b>If you are in danger or thinking of hurting yourself</b>')+
+    L('<p>Chiama subito il <a href="tel:112">112</a>. Non devi giustificarti con nessuno.</p>','<p>Call your local emergency number now — <a href="tel:112">112</a> in Europe, 911 in North America. You owe nobody an explanation.</p>')+
+    L('<b>Se hai bisogno di parlare con qualcuno</b>','<b>If you need to talk to someone</b>')+
+    L('<p><b>Telefono Amico Italia</b>: <a href="tel:+390223272327">02 2327 2327</a>, tutti i giorni, anche su WhatsApp al <a href="https://wa.me/393240117252" target="_blank" rel="noopener">324 011 7252</a>. Ascolto anonimo e gratuito.</p>','<p>In Italy, <b>Telefono Amico</b>: <a href="tel:+390223272327">02 2327 2327</a>, every day, also on WhatsApp at <a href="https://wa.me/393240117252" target="_blank" rel="noopener">324 011 7252</a>. Elsewhere, <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a> lists free helplines in your country.</p>')+
+    L('<p class="note" style="margin:6px 0 0">Il medico di base o uno psicologo sono la strada giusta anche quando non è un\u2019emergenza ma dura da settimane.</p>','<p class="note" style="margin:6px 0 0">Your doctor or a psychologist is the right route too, when it isn\u2019t an emergency but has lasted for weeks.</p>')+
+  '</div>';
+}
+function openSOS(){
+  sheet(L('<div style="flex:1"><h2>Se stai male adesso</h2></div>','<div style="flex:1"><h2>If you feel bad right now</h2></div>'),
+    helpBoxHTML()+
+    L('<p class="note" style="margin-top:14px">Il bestiario è un registro per tenere il conto, non una terapia e non un servizio di emergenza. Se una creatura cresce oltre quello che il diario contiene, parlarne con una persona reale è la mossa migliore.</p>','<p class="note" style="margin-top:14px">The bestiary is a ledger for keeping count, not therapy and not an emergency service. If a creature grows beyond what the diary can hold, talking to a real person is the better move.</p>'),
+    null, "night");
+}
+
 /* ===================== modo notte ===================== */
 function openNight(){
   var cs=living();
@@ -2307,8 +2400,10 @@ function openNight(){
       L('<select id="nt-who"><option value="">— nessuna in particolare</option>','<select id="nt-who"><option value="">— none in particular</option>')+
       cs.map(function(c){ return '<option value="'+c.id+'">'+esc(c.name)+'</option>'; }).join("")+
       '</select></div>' : "")+
-    L('<div class="btnrow"><button class="btn primary" id="nt-park">Parcheggiare il pensiero</button></div>','<div class="btnrow"><button class="btn primary" id="nt-park">Park the thought</button></div>'),
+    L('<div class="btnrow"><button class="btn primary" id="nt-park">Parcheggiare il pensiero</button></div>','<div class="btnrow"><button class="btn primary" id="nt-park">Park the thought</button></div>')+
+    L('<p class="note" style="margin-top:14px;text-align:center"><button class="sos-link" id="nt-sos">Se è più di un pensiero e stai davvero male \u2192</button></p>','<p class="note" style="margin-top:14px;text-align:center"><button class="sos-link" id="nt-sos">If it\u2019s more than a thought and you really feel bad \u2192</button></p>'),
     function(sh){
+      sh.querySelector("#nt-sos").onclick=openSOS;
       sh.querySelector("#nt-park").onclick=function(){
         var t=sh.querySelector("#nt-txt").value.trim();
         var who=sh.querySelector("#nt-who")?sh.querySelector("#nt-who").value:"";
@@ -2325,11 +2420,21 @@ function nightAnchors(parked){
     L('<div class="anchor"><b>Respira più a lungo in uscita</b>Inspira contando quattro, espira contando sei o otto. Non serve calmarsi: serve solo dare al corpo qualcosa da fare mentre passa.</div>','<div class="anchor"><b>Breathe out for longer</b>Breathe in for a count of four, out for six or eight. You don’t have to calm down: you just give the body something to do while it passes.</div>')+
     L('<div class="anchor" style="margin-top:12px"><b>Nomina cinque cose che vedi</b>Ad alta voce o a mente, lentamente. Riporta l’attenzione dentro la stanza, dove il pericolo non c’è.</div>','<div class="anchor" style="margin-top:12px"><b>Name five things you can see</b>Out loud or in your head, slowly. It brings attention back inside the room, where the danger isn’t.</div>')+
     L('<div class="anchor" style="margin-top:12px"><b>Se sei a letto da più di venti minuti, alzati</b>Luce bassa, una cosa noiosa, seduto. Torna a letto quando arriva il sonno: restare sveglio a letto insegna al cervello che il letto è il posto dove si combatte.</div>','<div class="anchor" style="margin-top:12px"><b>If you’ve been in bed more than twenty minutes, get up</b>Low light, something boring, sitting. Go back when sleep comes: lying awake in bed teaches the brain that bed is where you fight.</div>')+
-    L('<div class="btnrow" style="margin-top:16px"><button class="btn primary" id="nt-bed">Torno a letto</button></div>','<div class="btnrow" style="margin-top:16px"><button class="btn primary" id="nt-bed">Back to bed</button></div>'),
+    L('<div class="btnrow" style="margin-top:16px"><button class="btn primary" id="nt-bed">Torno a letto</button></div>','<div class="btnrow" style="margin-top:16px"><button class="btn primary" id="nt-bed">Back to bed</button></div>')+
+    '<div style="height:16px"></div>'+helpBoxHTML(),
     function(sh){ sh.querySelector("#nt-bed").onclick=closeSheet; }, "night");
 }
 
 /* ===================== sfide ===================== */
+function nextRung(c){
+  var cs=chalsOf(c);
+  if(c.freed||cs.some(function(x){ return !x.outcome; })) return null;
+  var done=cs.filter(function(x){ return x.outcome==="fatta"; }).sort(function(a,b){ return (a.closedAt||"")<(b.closedAt||"")?1:-1; });
+  if(!done.length) return null;
+  var last=done[0];
+  if(daysBetween(last.closedAt||last.due, todayISO())>21) return null;
+  return {what:last.what, fear:clamp(last.fear+1,2,10)};
+}
 function chalHTML(x, c){
   var late=!x.outcome && x.due<todayISO();
   var cls=x.outcome? (x.outcome==="non"?"chal miss":"chal done") : "chal";
@@ -2338,6 +2443,8 @@ function chalHTML(x, c){
     (x.outcome? L("chiusa il ","closed on ")+fmtDate(x.closedAt||x.due)
       : (late? L("scaduta il ","due on ")+fmtDate(x.due) : L("entro il ","due by ")+fmtDate(x.due)))+'</span>';
   out+='<span class="what">'+esc(x.what)+'</span>';
+  if(x.pred) out+='<p class="note" style="margin:2px 0 4px"><i>'+L("Temevi: ","You feared: ")+esc(x.pred)+'</i>'+
+    (x.outcome&&x.predHappened? ' — <b>'+(x.predHappened==="no"?L("non è successo","it didn\u2019t happen"):(x.predHappened==="parte"?L("successo in parte","partly happened"):L("è successo","it happened")))+'</b>' : '')+'</p>';
   if(x.outcome){
     var lbl=x.outcome==="fatta"?L("Fatta","Done"):(x.outcome==="parziale"?L("A metà","Halfway"):L("Non fatta","Not done"));
     out+='<div class="verdict"><b>'+lbl+'</b>';
@@ -2350,15 +2457,16 @@ function chalHTML(x, c){
     if(x.note) out+='<p class="note" style="margin:0">'+esc(x.note)+'</p>';
     out+='<div class="btnrow"><button class="btn ghost" data-chaldel="'+x.id+L('" style="font-size:14px;padding:7px">Cancellare</button></div>','" style="font-size:14px;padding:7px">Delete</button></div>');
   } else {
-    out+=L('<div class="verdict"><span>temi che sia ','<div class="verdict"><span>you expect it to be ')+x.fear+' su 10</span></div>';
+    out+=L('<div class="verdict"><span>temi che sia ','<div class="verdict"><span>you expect it to be ')+x.fear+L(' su 10',' out of 10')+'</span></div>';
     out+='<div class="seg"><button data-chal="'+x.id+L('" data-res="fatta">L’ho fatta</button>','" data-res="fatta">I did it</button>')+
       '<button data-chal="'+x.id+L('" data-res="parziale">A metà</button>','" data-res="parziale">Halfway</button>')+
       '<button data-chal="'+x.id+L('" data-res="non">Non l’ho fatta</button></div>','" data-res="non">I didn’t do it</button></div>');
   }
   return out+'</div>';
 }
-function openChallenge(id){
+function openChallenge(id, fear0){
   var c=byId(id); if(!c) return;
+  var fear=fear0||7;
   /* suggerimenti dagli evitamenti già annotati */
   var sugg=[];
   (c.entries||[]).slice().reverse().forEach(function(e){
@@ -2369,6 +2477,7 @@ function openChallenge(id){
   sheet('<div style="flex:1"><span class="kindtag '+(c.kind==="dievas"?"k-verd":"k-rub")+'"><i></i>'+esc(c.name)+'</span>'+
         L('<h2 style="margin-top:3px">Lanciare una sfida</h2></div>','<h2 style="margin-top:3px">Set a challenge</h2></div>'),
     L('<p class="note">Una cosa che questa creatura ti fa evitare, e che decidi di fare lo stesso. Piccola abbastanza da farla davvero.</p>','<p class="note">Something this creature makes you avoid, and that you decide to do anyway. Small enough that you’ll really do it.</p>')+
+    (c.values? '<div class="firststep"><b>'+L("Lo fai per","You\u2019re doing it for")+'</b><p>'+esc(c.values)+'</p></div>' : "")+
     L('<div class="field"><div class="lbl">Che cosa farai</div>','<div class="field"><div class="lbl">What you will do</div>')+
       L('<textarea id="ch-what" rows="2" placeholder="Chiamare il commercialista senza scrivermi prima la scaletta"></textarea>','<textarea id="ch-what" rows="2" placeholder="Call the accountant without scripting it first"></textarea>')+
       (sugg.length? L('<div class="hint">Dalle tue voci: ','<div class="hint">From your entries: ')+sugg.map(function(t,i){
@@ -2376,8 +2485,11 @@ function openChallenge(id){
     '</div>'+
     L('<div class="field"><div class="lbl">Entro quando</div><input type="date" id="ch-due" value="','<div class="field"><div class="lbl">By when</div><input type="date" id="ch-due" value="')+dISO(when)+'"></div>'+
     L('<div class="field"><div class="lbl">Quanto temi che sia brutta</div>','<div class="field"><div class="lbl">How bad you expect it to be</div>')+
-      '<div class="slider"><input type="range" id="ch-fear" min="1" max="10" value="7"><span class="val" id="ch-fearv">7</span></div>'+
+      '<div class="slider"><input type="range" id="ch-fear" min="1" max="10" value="'+fear+'"><span class="val" id="ch-fearv">'+fear+'</span></div>'+
       L('<div class="hint">Dichiaralo adesso. Dopo confronteremo questo numero con quello vero: è il confronto che smonta la paura.</div></div>','<div class="hint">Declare it now. Later we’ll compare this number with the real one: that comparison is what dismantles the fear.</div></div>')+
+    L('<div class="field"><div class="lbl">Che cosa temi che succeda</div>','<div class="field"><div class="lbl">What you fear will happen</div>')+
+      L('<textarea id="ch-pred" rows="2" placeholder="Mi tremerà la voce e penserà che sono incapace"></textarea>','<textarea id="ch-pred" rows="2" placeholder="My voice will shake and they\u2019ll think I\u2019m useless"></textarea>')+
+      L('<div class="hint">Facoltativo, ma è il pezzo più utile: dopo verificherai se è successo davvero.</div></div>','<div class="hint">Optional, but it\u2019s the most useful part: afterwards you\u2019ll check whether it really happened.</div></div>')+
     L('<div class="btnrow"><button class="btn primary" id="ch-save">Fissare la sfida</button></div>','<div class="btnrow"><button class="btn primary" id="ch-save">Set the challenge</button></div>'),
     function(sh){
       var sl=sh.querySelector("#ch-fear"), sv=sh.querySelector("#ch-fearv");
@@ -2390,7 +2502,7 @@ function openChallenge(id){
         if(!what){ toast(L("Scrivi che cosa farai.","Write what you will do.")); return; }
         c.challenges=chalsOf(c).concat([{
           id:uid(), what:what, due:sh.querySelector("#ch-due").value||todayISO(),
-          fear:parseInt(sl.value,10), created:todayISO(), outcome:null, actual:null, note:""
+          fear:parseInt(sl.value,10), pred:sh.querySelector("#ch-pred").value.trim(), created:todayISO(), outcome:null, actual:null, note:""
         }]);
         save(); closeSheet(); render(); openCreature(c.id);
         toast(L("Sfida fissata. Torna qui quando l’hai affrontata.","Challenge set. Come back here once you’ve faced it."));
@@ -2411,14 +2523,25 @@ function closeChallenge(cid, chid, res){
     (res==="non" ? "" :
       L('<div class="field"><div class="lbl">Quanto è stata brutta davvero</div>','<div class="field"><div class="lbl">How bad it really was</div>')+
       '<div class="slider"><input type="range" id="cl-act" min="1" max="10" value="'+Math.max(1,x.fear-2)+'"><span class="val" id="cl-actv">'+Math.max(1,x.fear-2)+'</span></div>'+
-      L('<div class="hint">La temevi ','<div class="hint">You feared it at ')+x.fear+'.</div></div>')+
+      L('<div class="hint">La temevi ','<div class="hint">You feared it at ')+x.fear+'.</div></div>'+
+      (x.pred? L('<div class="field"><div class="lbl">Temevi: «','<div class="field"><div class="lbl">You feared: «')+esc(x.pred)+L('». È successo?</div>','». Did it happen?</div>')+
+        '<div class="seg" id="cl-pred"><button data-p="no">'+L("No","No")+'</button><button data-p="parte">'+L("In parte","Partly")+'</button><button data-p="si">'+L("Sì","Yes")+'</button></div></div>' : ""))+
     L('<div class="field"><div class="lbl">Una riga, se vuoi</div><textarea id="cl-note" rows="2" placeholder="Com’è andata"></textarea></div>','<div class="field"><div class="lbl">One line, if you like</div><textarea id="cl-note" rows="2" placeholder="How it went"></textarea></div>')+
     L('<div class="btnrow"><button class="btn primary" id="cl-save">Chiudere la sfida</button></div>','<div class="btnrow"><button class="btn primary" id="cl-save">Close the challenge</button></div>'),
     function(sh){
       var sl=sh.querySelector("#cl-act"), sv=sh.querySelector("#cl-actv");
       if(sl) sl.oninput=function(){ sv.textContent=sl.value; };
+      var ppick=null;
+      sh.querySelectorAll("#cl-pred button").forEach(function(b){
+        b.onclick=function(){
+          ppick=b.dataset.p;
+          sh.querySelectorAll("#cl-pred button").forEach(function(y){ y.removeAttribute("aria-pressed"); });
+          b.setAttribute("aria-pressed","true");
+        };
+      });
       sh.querySelector("#cl-save").onclick=function(){
         x.outcome=res;
+        if(ppick) x.predHappened=ppick;
         x.actual=sl?parseInt(sl.value,10):null;
         x.note=sh.querySelector("#cl-note").value.trim();
         x.closedAt=todayISO();
@@ -2432,7 +2555,8 @@ function closeChallenge(cid, chid, res){
             cbt:{thought:"",pro:"",con:"",reframe:""}, ritual:{what:"",outcome:""}});
         }
         clearSprites(); save(); closeSheet(); render(); openCreature(c.id);
-        if(res!=="non"&&typeof x.actual==="number"&&x.actual<x.fear)
+        if(ppick==="no") toast(L("Quello che temevi non è successo. È questo che la paura deve imparare.","What you feared didn\u2019t happen. That\u2019s exactly what the fear needs to learn."));
+        else if(res!=="non"&&typeof x.actual==="number"&&x.actual<x.fear)
           toast(L("La temevi ","You feared it at ")+x.fear+L(", è stata ",", it was ")+x.actual+L(". Segnatelo.",". Note that down."));
         else toast(L("Sfida chiusa.","Challenge closed."));
       };
@@ -2637,6 +2761,90 @@ function omens(){
   return out;
 }
 
+/* ===================== termometro (GAD-7) ===================== */
+/* GAD-7: Spitzer, Williams, Kroenke e colleghi; uso libero senza permesso. Testo italiano dalla versione ufficiale. */
+var GAD_ITEMS=[
+  [L("Sentirsi nervoso/a, ansioso/a o teso/a","Feeling nervous, anxious, or on edge")],
+  [L("Non riuscire a smettere di preoccuparsi o a tenere sotto controllo le preoccupazioni","Not being able to stop or control worrying")],
+  [L("Preoccuparsi troppo per varie cose","Worrying too much about different things")],
+  [L("Avere difficoltà a rilassarsi","Trouble relaxing")],
+  [L("Essere talmente irrequieto/a da far fatica a stare seduto/a fermo/a","Being so restless that it is hard to sit still")],
+  [L("Infastidirsi o irritarsi facilmente","Becoming easily annoyed or irritable")],
+  [L("Avere paura che possa succedere qualcosa di terribile","Feeling afraid, as if something awful might happen")]
+];
+var GAD_ANS=[L("Mai","Not at all"),L("Alcuni giorni","Several days"),L("Per oltre la metà dei giorni","More than half the days"),L("Quasi ogni giorno","Nearly every day")];
+var CHECK_DAYS=28;
+function checksOf(){ return (S.checks||[]).slice().sort(function(a,b){ return a.date<b.date?-1:1; }); }
+function lastCheck(){ var c=checksOf(); return c.length?c[c.length-1]:null; }
+function checkDue(){ var l=lastCheck(); return !l || daysBetween(l.date,todayISO())>=CHECK_DAYS; }
+function gadBand(sc){
+  if(sc<5) return {k:"min", t:L("minima","minimal"), col:"var(--verd)"};
+  if(sc<10) return {k:"lieve", t:L("lieve","mild"), col:"var(--gold)"};
+  if(sc<15) return {k:"mod", t:L("moderata","moderate"), col:"var(--ember)"};
+  return {k:"grave", t:L("grave","severe"), col:"var(--rubric)"};
+}
+function termoSec(lv){
+  if(lv<2&&!(S.checks||[]).length) return "";
+  var cs=checksOf(), l=lastCheck(), due=checkDue();
+  var hist=cs.slice(-8).map(function(x){
+    var b=gadBand(x.score);
+    return '<div class="tm-col" title="'+fmtDate(x.date)+': '+x.score+'"><span style="height:'+Math.round(6+x.score/21*94)+'%;background:'+b.col+'"></span><i>'+String(x.date).slice(8,10)+" "+MESI3[parseInt(String(x.date).slice(5,7),10)-1]+'</i></div>';
+  }).join("");
+  var body = l
+    ? '<p class="prose">'+L("Ultima misura, il ","Last reading, on ")+fmtDate(l.date)+': <b>'+l.score+L(" su 21"," out of 21")+'</b> — '+L("ansia ","anxiety ")+'<b style="color:'+gadBand(l.score).col+'">'+gadBand(l.score).t+'</b>.</p>'+
+      (cs.length>1? '<div class="tm-hist">'+hist+'</div>' : "")+
+      (due? '<p class="note">'+L("È passato un mese: è il momento di una nuova misura.","A month has passed: time for a new reading.")+'</p>' : '<p class="note">'+L("Prossima misura fra ","Next reading in ")+(CHECK_DAYS-daysBetween(l.date,todayISO()))+L(" giorni."," days.")+'</p>')
+    : '<p class="note">'+L("Sette domande, una volta al mese, sull\u2019ansia in generale: non su una creatura, su di te. Serve a vedere se, nel complesso, sta calando.","Seven questions, once a month, about anxiety in general: not about one creature, about you. It shows whether, overall, it\u2019s coming down.")+'</p>';
+  return sec("termometro", L("Termometro","Thermometer")+(due&&S.creatures.length?' <span class="duedot"></span>':''), "termometro",
+    body+'<div class="btnrow"><button class="btn'+(due?" primary":"")+'" id="t-go">'+(l?L("Misurare adesso","Take a reading now"):L("Fare la prima misura","Take the first reading"))+'</button></div>');
+}
+function openCheck(){
+  var ans=[null,null,null,null,null,null,null];
+  sheet(L('<div style="flex:1"><h2>Termometro</h2></div>','<div style="flex:1"><h2>Thermometer</h2></div>'),
+    L('<p class="note"><b>Nelle ultime 2 settimane</b>, con quale frequenza ti ha dato fastidio ciascuno di questi problemi?</p>','<p class="note"><b>Over the last 2 weeks</b>, how often have you been bothered by the following problems?</p>')+
+    GAD_ITEMS.map(function(it,i){
+      return '<div class="field gad"><div class="lbl">'+(i+1)+'. '+esc(it[0])+'</div><div class="gadopts" data-q="'+i+'">'+
+        GAD_ANS.map(function(a,v){ return '<button type="button" data-v="'+v+'">'+esc(a)+'</button>'; }).join("")+'</div></div>';
+    }).join("")+
+    L('<p class="note">GAD-7: un questionario standard e molto usato. Il punteggio è un andamento personale, non una diagnosi.</p>','<p class="note">GAD-7: a standard, widely used questionnaire. The score is a personal trend, not a diagnosis.</p>')+
+    '<div class="btnrow"><button class="btn primary" id="gad-save">'+L("Registrare la misura","Record the reading")+'</button></div>',
+    function(sh){
+      sh.querySelectorAll(".gadopts").forEach(function(g){
+        var q=parseInt(g.dataset.q,10);
+        g.querySelectorAll("button").forEach(function(b){
+          b.onclick=function(){
+            ans[q]=parseInt(b.dataset.v,10);
+            g.querySelectorAll("button").forEach(function(x){ x.removeAttribute("aria-pressed"); });
+            b.setAttribute("aria-pressed","true");
+          };
+        });
+      });
+      sh.querySelector("#gad-save").onclick=function(){
+        var miss=ans.indexOf(null);
+        if(miss>=0){ toast(L("Manca la risposta alla domanda ","Question ")+(miss+1)+L("."," still needs an answer.")); return; }
+        var score=ans.reduce(function(a,b){ return a+b; },0);
+        var prev=lastCheck();
+        S.checks=(S.checks||[]).concat([{id:uid(), date:todayISO(), items:ans.slice(), score:score}]);
+        save();
+        checkResult(score, prev);
+      };
+    });
+}
+function checkResult(score, prev){
+  var b=gadBand(score);
+  var diff=prev? score-prev.score : null;
+  sheet('<div style="flex:1"><h2>'+score+L(" su 21"," out of 21")+'</h2></div>',
+    '<p class="prose">'+L("Ansia ","Anxiety ")+'<b style="color:'+b.col+'">'+b.t+'</b>'+
+      (diff===null? "." : (diff<0? L(", ",", ")+(-diff)+L(" punti in meno dell\u2019ultima volta."," points lower than last time.") : (diff>0? L(", ",", ")+diff+L(" punti in più dell\u2019ultima volta."," points higher than last time.") : L(", come l\u2019ultima volta.",", the same as last time."))))+'</p>'+
+    (score>=15
+      ? L('<p class="note">Un punteggio così alto dice che l\u2019ansia sta pesando molto. Vale davvero la pena parlarne con il medico o con uno psicologo: non perché ci sia qualcosa che non va in te, ma perché esistono aiuti che funzionano.</p>','<p class="note">A score this high says anxiety is weighing heavily. It\u2019s really worth talking to your doctor or a psychologist: not because something is wrong with you, but because there is help that works.</p>')+helpBoxHTML()
+      : (score>=10
+        ? L('<p class="note">Da 10 in su, di solito si consiglia di parlarne con il medico o con uno psicologo. Il bestiario può accompagnare quel percorso, non sostituirlo: la relazione di otto settimane è un buon punto da cui partire.</p>','<p class="note">From 10 upwards, it\u2019s usually advised to talk to your doctor or a psychologist. The bestiary can accompany that path, not replace it: the eight-week report is a good place to start.</p>')
+        : L('<p class="note">Torna a misurare fra un mese: conta l\u2019andamento, non il singolo numero.</p>','<p class="note">Come back in a month: the trend counts, not the single number.</p>')))+
+    '<div class="btnrow"><button class="btn primary" id="gad-ok">'+L("Chiudi","Close")+'</button></div>',
+    function(sh){ sh.querySelector("#gad-ok").onclick=function(){ closeSheet(); render(); }; });
+}
+
 /* ===================== registro ===================== */
 function heatColor(avg){
   if(avg==null) return "rgba(44,31,18,.07)";
@@ -2648,7 +2856,7 @@ var ACC_KEY="bestiario.acc.v1";
 var accOpen=null;
 function accState(){
   if(accOpen) return accOpen;
-  accOpen={comesiusa:0, presagi:1, parcheggiati:1, sfide:1, calendario:0, terreno:1, potenza:0,
+  accOpen={comesiusa:0, termometro:1, presagi:1, parcheggiati:1, sfide:1, calendario:0, terreno:1, potenza:0,
            bilancia:0, costi:0, rituali:0, trigger:0, creature:1, relazione:0, cronaca:0, custodia:0};
   try{
     var raw=localStorage.getItem(ACC_KEY);
@@ -2667,6 +2875,8 @@ function sec(id, title, helpKey, body){
 
 function renderRegistro(){
   var m=dayMap(), st=streakInfo(m), all=allEntries(), gt30=groundTally(30);
+  var lv=revealLevel();
+  var adv=function(html){ return lv>=3?html:""; };
   var totVoci=all.length;
 
   /* calendario: ultime 26 settimane */
@@ -2680,7 +2890,7 @@ function renderRegistro(){
   }
   var calHTML='<div class="calgrid">'+cells.map(function(c2){
     if(!c2) return '<i style="background:transparent;border-color:transparent"></i>';
-    return '<i title="'+c2.k+(c2.n?" · "+c2.n+" voci":"")+'" style="background:'+heatColor(c2.avg)+'"></i>';
+    return '<i title="'+c2.k+(c2.n?" · "+c2.n+(c2.n===1?L(" voce"," entry"):L(" voci"," entries")):"")+'" style="background:'+heatColor(c2.avg)+'"></i>';
   }).join("")+'</div>';
 
   /* domini */
@@ -2693,7 +2903,7 @@ function renderRegistro(){
   var barsHTML=REGIONS.map(function(r){
     var d=reg[r.k];
     return '<div class="bar"><span>'+esc(r.name)+'</span>'+
-      '<span class="n">'+d.n+" vive"+(d.free?" · "+d.free+L(" in cielo"," in heaven"):"")+'</span>'+
+      '<span class="n">'+d.n+L(" vive"," living")+(d.free?" · "+d.free+L(" in cielo"," in heaven"):"")+'</span>'+
       '<span class="track"><span class="fill" style="width:'+Math.round(d.pw/maxPw*100)+'%;background:'+
         (d.pw?"linear-gradient(90deg,#9E2B15,#C4551D)":"transparent")+'"></span></span></div>';
   }).join("");
@@ -2759,6 +2969,7 @@ function renderRegistro(){
             ? ': <span class="gap">'+(cs.fear-cs.real).toFixed(1)+L(' di paura in eccesso</span>.',' of surplus fear</span>.')
             : '.')+'</p>'
         : "")+
+      (function(){ var ps=predStats(); return ps.n? '<p class="prose" style="margin-bottom:12px">'+L("Delle paure che hai messo per iscritto, ","Of the fears you put in writing, ")+'<b>'+ps.no+L(" su "," out of ")+ps.n+'</b>'+(ps.n===1?L(" non si è avverata."," didn\u2019t come true."):L(" non si sono avverate."," didn\u2019t come true."))+'</p>' : ""; })()+
       (pend.length
         ? pend.map(function(o){
             var late=o.x.due<todayISO();
@@ -2853,8 +3064,8 @@ function renderRegistro(){
     '<div class="sheetpage">'+
       '<div>'+
         '<div class="tally">'+
-          '<div><b>'+living().length+'</b><span>vive</span></div>'+
-          '<div><b>'+freedOnes().length+'</b><span>liberate</span></div>'+
+          '<div><b>'+living().length+'</b><span>'+(living().length===1?L("viva","living"):L("vive","living"))+'</span></div>'+
+          '<div><b>'+freedOnes().length+'</b><span>'+(freedOnes().length===1?L("liberata","released"):L("liberate","released"))+'</span></div>'+
           '<div data-help="terreno"><b style="font-size:19px"><span style="color:var(--verd)">+'+gt30.won+'</span> <span style="color:var(--rubric)">\u2212'+gt30.lost+L('</span></b><span>terreno 30gg</span></div>','</span></b><span>ground 30d</span></div>')+
           '<div data-help="tempesta"><b class="storm">'+stormCount(30)+L('</b><span>tempeste</span></div>','</b><span>storms</span></div>')+
         '</div>'+
@@ -2865,7 +3076,9 @@ function renderRegistro(){
 
       (pk.length? sec("parcheggiati",L("Pensieri parcheggiati","Parked thoughts"),"notte", parkHTML) : "")+
 
-      sec("sfide",L("Sfide","Challenges"),"sfida", chalHTMLall)+
+      termoSec(lv)+
+
+      (lv>=2? sec("sfide",L("Sfide","Challenges"),"sfida", chalHTMLall) : "")+
 
       sec("terreno",L("Terreno","Ground"),"terreno", groundHTML)+
 
@@ -2883,29 +3096,33 @@ function renderRegistro(){
         '<div style="height:12px"></div>'+
         L('<div class="btnrow"><button class="btn primary" id="r-new">Evocare una creatura</button></div>','<div class="btnrow"><button class="btn primary" id="r-new">Summon a creature</button></div>'))+
 
-      sec("costi",L("Che cosa ti costa","What it costs you"),"costo", costHTML)+
+      adv(sec("costi",L("Che cosa ti costa","What it costs you"),"costo", costHTML))+
 
-      sec("calendario",L("Calendario delle apparizioni","Calendar of appearances"),"calendario",
+      adv(sec("calendario",L("Calendario delle apparizioni","Calendar of appearances"),"calendario",
         '<div class="cal">'+calHTML+'</div>'+
         L('<div class="callegend"><span>quieto</span><i style="background:','<div class="callegend"><span>quiet</span><i style="background:')+heatColor(null)+'"></i>'+
         '<i style="background:'+heatColor(3)+'"></i><i style="background:'+heatColor(6)+'"></i>'+
-        '<i style="background:'+heatColor(9)+L('"></i><span>tempesta</span></div>','"></i><span>storm</span></div>'))+
+        '<i style="background:'+heatColor(9)+L('"></i><span>tempesta</span></div>','"></i><span>storm</span></div>')))+
 
-      sec("potenza",L("Potenza nel tempo","Power over time"),"potenza",
+      adv(sec("potenza",L("Potenza nel tempo","Power over time"),"potenza",
         L('<p class="note" style="margin-bottom:10px">Quanto forte le hai sentite, settimana per settimana. È la misura secondaria: guardala dopo il terreno, non prima.</p>','<p class="note" style="margin-bottom:10px">How strongly you felt them, week by week. This is the secondary measure: look at it after the ground, not before.</p>')+
-        trendHTML)+
+        trendHTML))+
 
-      sec("bilancia",L("Bilancia dei domini","Balance of domains"),"bilancia", '<div class="bars">'+barsHTML+'</div>')+
+      adv(sec("bilancia",L("Bilancia dei domini","Balance of domains"),"bilancia", '<div class="bars">'+barsHTML+'</div>'))+
 
-      sec("rituali",L("Efficacia dei rituali","Ritual effectiveness"),"rituale", '<div class="rites">'+ritesHTML+'</div>')+
+      adv(sec("rituali",L("Efficacia dei rituali","Ritual effectiveness"),"rituale", '<div class="rites">'+ritesHTML+'</div>'))+
 
-      sec("trigger",L("Trigger ricorrenti","Recurring triggers"),"trigger", cloudHTML)+
+      adv(sec("trigger",L("Trigger ricorrenti","Recurring triggers"),"trigger", cloudHTML))+
 
-      sec("relazione",L("Relazione","Report"),"relazione",
+      adv(sec("relazione",L("Relazione","Report"),"relazione",
         L('<p class="note" style="margin-bottom:10px">Otto settimane in una pagina sola: terreno, presa, che cosa ha retto, quali parole tornano. Da rileggere, da stampare, o da portare a qualcuno.</p>','<p class="note" style="margin-bottom:10px">Eight weeks on a single page: ground, grip, what held, which words keep coming back. To reread, to print, or to bring to someone.</p>')+
-        L('<div class="btnrow"><button class="btn" id="r-report">Aprire la relazione</button></div>','<div class="btnrow"><button class="btn" id="r-report">Open the report</button></div>'))+
+        L('<div class="btnrow"><button class="btn" id="r-report">Aprire la relazione</button></div>','<div class="btnrow"><button class="btn" id="r-report">Open the report</button></div>')))+
 
-      sec("cronaca",L("Cronaca","Chronicle"),null, '<div class="chron">'+chron+'</div>')+
+      adv(sec("cronaca",L("Cronaca","Chronicle"),null, '<div class="chron">'+chron+'</div>'))+
+      (lv<3? '<div class="firststep" style="margin:14px 0"><b>'+L("Altre pagine si riveleranno","More pages will reveal themselves")+'</b><p>'+
+        (lv<2? L("Dopo tre voci (o qualche giorno) arrivano le sfide; dopo dieci voci il calendario, i rituali, i trigger e la relazione. Così all\u2019inizio c\u2019è solo quello che serve.","After three entries (or a few days) the challenges arrive; after ten entries, the calendar, rituals, triggers and the report. That way at the start there\u2019s only what you need.")
+              : L("Dopo dieci voci (o due settimane) arrivano il calendario, i rituali, i trigger e la relazione.","After ten entries (or two weeks) the calendar, rituals, triggers and the report arrive."))+
+        '</p><div class="btnrow"><button class="btn ghost" id="r-revall">'+L("Mostrare tutto subito","Show everything now")+'</button></div></div>' : "")+
 
       sec("comesiusa",L("Come si usa","How to use it"),null,
         L('<p class="note" style="margin-bottom:10px">Cinque passi, il ritmo giusto e a che cosa serve davvero il diario.</p>','<p class="note" style="margin-bottom:10px">Five steps, the right pace, and what the diary is actually for.</p>')+
@@ -2916,6 +3133,10 @@ function renderRegistro(){
           L('<button id="m-seal">Scaricare il tomo intero<small>Un file HTML che contiene l&rsquo;app <em>e</em> tutte le tue creature: si apre da solo, anche senza rete. Il modo pi&ugrave; sicuro di non perdere niente.</small></button>','<button id="m-seal">Download the whole tome<small>An HTML file containing the app <em>and</em> all your creatures: it opens on its own, even offline. The safest way not to lose anything.</small></button>')+
           L('<button id="m-export">Esportare un backup<small>Scarica tutto in un file .json</small></button>','<button id="m-export">Export a backup<small>Downloads everything as a .json file</small></button>')+
           L('<button id="m-import">Importare un backup<small>Sostituisce i dati di questo dispositivo</small></button>','<button id="m-import">Import a backup<small>Replaces the data on this device</small></button>')+
+          L('<button id="m-remind">Promemoria serale<small>Un evento ogni sera nel calendario del telefono</small></button>','<button id="m-remind">Evening reminder<small>A daily event in your phone\u2019s calendar</small></button>')+
+          L('<button id="m-install">Installare sul telefono<small>Icona sulla schermata Home, funziona anche senza rete</small></button>','<button id="m-install">Install on your phone<small>Home-screen icon, works offline</small></button>')+
+          '<button id="m-plain">'+(plainOn()?L("Caratteri decorati","Decorative lettering"):L("Caratteri semplici","Plain lettering"))+'<small>'+(plainOn()?L("Torna ai caratteri gotici","Back to the gothic letters"):L("Più facili da leggere, senza gotico","Easier to read, no gothic"))+'</small></button>'+
+          L('<button id="m-sos">Se stai male adesso<small>Numeri di emergenza e di ascolto</small></button>','<button id="m-sos">If you feel bad right now<small>Emergency numbers and helplines</small></button>')+
           L('<button id="m-intro">Rivedere la guida<small>Le tre schermate della prima apertura</small></button>','<button id="m-intro">Replay the guide<small>The screens you saw on first opening</small></button>')+
           L('<button id="m-lang">English<small>Passa all’inglese: la pagina si ricarica, i dati restano.</small></button>','<button id="m-lang">Italiano<small>Switch back to Italian: the page reloads, your data stays.</small></button>')+
         '</div>'+
@@ -2966,6 +3187,10 @@ function renderRegistro(){
   el("m-export").onclick=exportBackup;
   el("m-import").onclick=importBackup;
   el("m-intro").onclick=function(){ closeSheet(); showIntro(); };
+  el("m-sos").onclick=openSOS;
+  el("m-remind").onclick=openReminder;
+  el("m-install").onclick=openInstall;
+  el("m-plain").onclick=function(){ setPlain(!plainOn()); renderRegistro(); };
   el("m-lang").onclick=switchLang;
   el("reg").querySelectorAll("details[data-acc]").forEach(function(d){
     d.addEventListener("toggle", function(){ accState()[d.dataset.acc]=d.open?1:0; accSave(); });
@@ -2979,7 +3204,12 @@ function renderRegistro(){
   el("reg").querySelectorAll("[data-pkwrite]").forEach(function(b){
     b.onclick=function(){ releaseParked(b.dataset.pkwrite,true); openEntry(b.dataset.c); };
   });
-  el("r-report").onclick=openReport;
+  if(el("r-report")) el("r-report").onclick=openReport;
+  if(el("r-revall")) el("r-revall").onclick=function(){
+    try{ localStorage.setItem(REVEAL_KEY,"all"); localStorage.setItem(REVEAL_SEEN,"3"); }catch(e){}
+    renderRegistro();
+  };
+  if(el("t-go")) el("t-go").onclick=openCheck;
   el("r-manual").onclick=openManual;
   applyTextures();
 }
@@ -3163,8 +3393,8 @@ function reportInner(){
   var out="";
   out+=L('<p class="note">Dal ','<p class="note">From ')+fmtLong(d.sinceISO)+' al '+fmtLong(todayISO())+' \u00b7 '+d.voci+L(' voci di diario.</p>',' diary entries.</p>');
   out+='<div class="tally">'+
-    '<div><b>'+living().length+'</b><span>vive</span></div>'+
-    '<div><b>'+freedOnes().length+'</b><span>liberate</span></div>'+
+    '<div><b>'+living().length+'</b><span>'+(living().length===1?L("viva","living"):L("vive","living"))+'</span></div>'+
+    '<div><b>'+freedOnes().length+'</b><span>'+(freedOnes().length===1?L("liberata","released"):L("liberate","released"))+'</span></div>'+
     '<div><b class="win">+'+d.won+L('</b><span>tenuto</span></div>','</b><span>held</span></div>')+
     '<div><b class="lose">\u2212'+d.lost+L('</b><span>ceduto</span></div>','</b><span>given up</span></div>')+
   '</div>';
@@ -3301,6 +3531,9 @@ function openManual(){
     L('<p class="prose">A tre cose, in ordine di importanza. <b>Vedere l’evitamento</b>: nel momento non ti accorgi di stare rinunciando a qualcosa, a distanza di settimane invece si conta. <b>Rendere la bestia una cosa esterna</b>, con un nome e una faccia, invece di uno stato d’animo che sei tu. <b>Accorgerti dei cambiamenti lenti</b>: nessuno ricorda com’era due mesi fa, i numeri sì.</p>','<p class="prose">Three things, in order of importance. <b>Seeing the avoidance</b>: in the moment you don’t notice you’re giving something up, but weeks later it adds up. <b>Making the beast something outside you</b>, with a name and a face, instead of a mood that <i>is</i> you. <b>Noticing slow change</b>: nobody remembers what two months ago felt like — the numbers do.</p>')+
     L('<p class="note">Quello che il diario non fa: farla passare mentre la scrivi. Se ti accorgi di scrivere <i>durante</i> l’ansia per calmarti, stai usando l’app come rassicurazione — chiudila e scrivi stasera.</p>','<p class="note">What the diary doesn’t do: make it pass while you write. If you catch yourself writing <i>during</i> the anxiety in order to calm down, you’re using the app as reassurance — close it and write tonight.</p>')+
 
+    L('<div class="rubric"><h2>Che cosa non è</h2></div>','<div class="rubric"><h2>What it isn\u2019t</h2></div>')+
+    L('<p class="prose">Non è una terapia e non fa diagnosi. Usa tecniche che vengono dalla terapia cognitivo-comportamentale — guardare l\u2019evitamento, esporsi a piccoli passi, rimandare il rimuginio — ma da sola non sostituisce un professionista. Se l\u2019ansia ti toglie il sonno, il lavoro o le persone da settimane, parlane col medico o con uno psicologo: il tomo e la relazione di otto settimane sono un ottimo punto da cui partire.</p>','<p class="prose">It isn\u2019t therapy and it doesn\u2019t diagnose. It uses techniques from cognitive behavioural therapy — watching avoidance, small-step exposure, postponing worry — but on its own it doesn\u2019t replace a professional. If anxiety has been taking your sleep, your work or your people for weeks, talk to your doctor or a psychologist: the tome and the eight-week report are a good place to start.</p>')+
+    L('<div class="btnrow"><button class="btn" id="mn-sos">Se stai male adesso</button></div>','<div class="btnrow"><button class="btn" id="mn-sos">If you feel bad right now</button></div>')+
     L('<div class="rubric"><h2>Le tre ante</h2></div>','<div class="rubric"><h2>The three panels</h2></div>')+
     L('<p class="prose"><b>Inferno</b> (destra): la mappa delle creature vive. Pizzica per ingrandire, trascina una bestia per spostarla, toccala per aprirla.<br>','<p class="prose"><b>Inferno</b> (right): the map of living creatures. Pinch to zoom, drag a beast to move it, tap it to open it.<br>')+
     L('<b>Registro</b> (centro): i conti del custode, l’elenco completo, la relazione, i backup.<br>','<b>Ledger</b> (centre): the keeper’s accounts, the full list, the report, the backups.<br>')+
@@ -3308,6 +3541,7 @@ function openManual(){
     L('<div class="btnrow"><button class="btn" id="mn-intro">Rivedere il tutorial</button></div>','<div class="btnrow"><button class="btn" id="mn-intro">Replay the tutorial</button></div>'),
     function(sh){
       sh.querySelector("#mn-intro").onclick=function(){ closeSheet(); showIntro(); };
+      sh.querySelector("#mn-sos").onclick=openSOS;
     });
 }
 
@@ -3329,7 +3563,9 @@ function showIntro(){
     {t:L("Quando raccontare","When to tell the story"), k:"dievas", seed:59003,
      d:L("Una o due volte a settimana, quando succede qualcosa che vale il racconto, scrivi la <b>voce lunga</b>: cosa è accaduto, la frase esatta che ti ha detto in testa, come l’hai smontata, che rituale hai provato e se ha retto. A freddo, la sera: scrivere durante il picco la alimenta.","Once or twice a week, when something happens that’s worth telling, write the <b>long entry</b>: what happened, the exact sentence it said in your head, how you took it apart, what ritual you tried and whether it held. Cold, in the evening: writing during the spike feeds it.")},
     {t:L("Le tre ante","The three panels"), k:"demone", seed:11777,
-     d:L("A destra l’<b>Inferno</b>, dove vivono. Al centro il <b>Registro</b>, che tiene i conti e ti dice cosa vede. A sinistra il <b>Paradiso</b>: quando una creatura non decide più che cosa fai, il <b>rito</b> la manda là — col diario intatto, e con la possibilità di riportarla giù.","On the right the <b>Inferno</b>, where they live. In the centre the <b>Ledger</b>, which keeps the count and tells you what it sees. On the left <b>Paradise</b>: when a creature no longer decides what you do, the <b>rite</b> sends it there — diary intact, and with the option of bringing it back down.")}
+     d:L("A destra l’<b>Inferno</b>, dove vivono. Al centro il <b>Registro</b>, che tiene i conti e ti dice cosa vede. A sinistra il <b>Paradiso</b>: quando una creatura non decide più che cosa fai, il <b>rito</b> la manda là — col diario intatto, e con la possibilità di riportarla giù.","On the right the <b>Inferno</b>, where they live. In the centre the <b>Ledger</b>, which keeps the count and tells you what it sees. On the left <b>Paradise</b>: when a creature no longer decides what you do, the <b>rite</b> sends it there — diary intact, and with the option of bringing it back down.")},
+    {t:L("Uno strumento, non una cura","A tool, not a cure"), k:"dievas", seed:24601,
+     d:L("Il bestiario aiuta a tenere il conto e a riprenderti spazio, ma non è una terapia. Se stai male davvero, la <b>luna</b> in alto porta anche ai numeri di emergenza e di ascolto. E parlarne con una persona reale resta sempre la mossa migliore.","The bestiary helps you keep count and take back space, but it isn\u2019t therapy. If you really feel bad, the <b>moon</b> at the top also leads to emergency numbers and helplines. And talking to a real person is always the better move.")}
   ];
   var i=0;
   var ov=document.createElement("div");
@@ -3419,6 +3655,53 @@ function exportBackup(){
   else showRaw(data);
 }
 
+/* ===================== promemoria serale (calendario) ===================== */
+function appURL(){ return /^https?:$/.test(location.protocol) ? location.origin+location.pathname : ""; }
+function icsStamp(d){ return d.toISOString().replace(/[-:]/g,"").replace(/\.\d+/,""); }
+function openReminder(){
+  sheet(L('<h2>Promemoria serale</h2>','<h2>Evening reminder</h2>'),
+    L('<p class="note">Il bestiario funziona se lo apri ogni sera. Senza un server non può mandarti notifiche da solo, quindi il promemoria lo mette il tuo calendario: un evento ogni giorno all\u2019ora che scegli, con il link per aprire subito la rassegna. Resta tutto sul tuo telefono.</p>','<p class="note">The bestiary works if you open it every evening. Without a server it can\u2019t send notifications by itself, so your calendar does the reminding: an event every day at the time you choose, with a link that opens the round straight away. Everything stays on your phone.</p>')+
+    L('<div class="field"><div class="lbl">A che ora</div>','<div class="field"><div class="lbl">At what time</div>')+'<input type="time" id="rm-time" value="21:30"></div>'+
+    '<div class="btnrow"><button class="btn primary" id="rm-go">'+L("Aggiungere al calendario","Add to calendar")+'</button></div>'+
+    L('<p class="note">Si scarica un file .ics: aprilo e conferma. Su iPhone tocca «Aggiungi tutto».</p>','<p class="note">An .ics file downloads: open it and confirm. On iPhone tap “Add All”.</p>'),
+    function(sh){
+      sh.querySelector("#rm-go").onclick=function(){
+        var t=(sh.querySelector("#rm-time").value||"21:30").split(":");
+        var d=new Date(); d.setHours(parseInt(t[0],10)||21, parseInt(t[1],10)||0, 0, 0);
+        if(d<new Date()) d=new Date(d.getTime()+86400000);
+        var pad=function(n){ return String(n).padStart(2,"0"); };
+        var start=d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+"T"+pad(d.getHours())+pad(d.getMinutes())+"00";
+        var url=appURL(), link=url? url+"?rassegna=1" : "";
+        var title=L("Rassegna serale \u2014 Bestiario","Evening round \u2014 Bestiary");
+        var desc=L("Due tocchi per ogni creatura che si è fatta viva oggi.","Two taps for each creature that showed up today.")+(link?"\\n"+link:"");
+        var ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Bestiario dell'Abisso//IT","CALSCALE:GREGORIAN","BEGIN:VEVENT",
+          "UID:"+uid()+"@bestiario","DTSTAMP:"+icsStamp(new Date()),"DTSTART:"+start,"DURATION:PT5M","RRULE:FREQ=DAILY",
+          "SUMMARY:"+title,"DESCRIPTION:"+desc].concat(link?["URL:"+link]:[]).concat([
+          "BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:PT0M","DESCRIPTION:"+title,"END:VALARM","END:VEVENT","END:VCALENDAR"]).join("\r\n");
+        if(downloadBlob(new Blob([ics],{type:"text/calendar"}), "bestiario-promemoria.ics")){
+          closeSheet(); toast(L("File scaricato: aprilo per aggiungere il promemoria.","File downloaded: open it to add the reminder."));
+        } else toast(L("Download non riuscito.","Download failed."));
+      };
+    });
+}
+var installEvt=null;
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); installEvt=e; });
+function isStandalone(){ return (window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone===true; }
+function openInstall(){
+  var ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  var body;
+  if(isStandalone()) body=L('<p class="prose">È già installata: la stai usando come app.</p>','<p class="prose">It\u2019s already installed: you\u2019re using it as an app.</p>');
+  else if(!appURL()) body=L('<p class="note">Questa è una copia aperta da file. Per installarla, aprila dal sito.</p>','<p class="note">This is a copy opened from a file. To install it, open it from the website.</p>');
+  else if(installEvt) body=L('<p class="note">Avrà la sua icona, si aprirà a schermo intero e funzionerà anche senza rete. I dati restano gli stessi.</p>','<p class="note">It gets its own icon, opens full screen and works offline too. The data stays the same.</p>')+
+    '<div class="btnrow"><button class="btn primary" id="in-go">'+L("Installare","Install")+'</button></div>';
+  else if(ios) body=L('<ol class="prose"><li>Apri questa pagina in <b>Safari</b>.</li><li>Tocca il pulsante <b>Condividi</b> (il quadrato con la freccia).</li><li>Scegli <b>Aggiungi alla schermata Home</b>.</li></ol><p class="note">Avrà la sua icona e funzionerà anche senza rete. Attenzione: l\u2019app installata ha una memoria separata da Safari — prima di passare, scarica un backup qui e importalo là.</p>','<ol class="prose"><li>Open this page in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (the square with the arrow).</li><li>Choose <b>Add to Home Screen</b>.</li></ol><p class="note">It gets its own icon and works offline. Note: the installed app keeps its storage separate from Safari — before switching, download a backup here and import it there.</p>');
+  else body=L('<p class="note">Dal menu del browser (\u22EE) scegli <b>Installa app</b> o <b>Aggiungi a schermata Home</b>.</p>','<p class="note">From the browser menu (\u22EE) choose <b>Install app</b> or <b>Add to Home screen</b>.</p>');
+  sheet(L('<h2>Installare sul telefono</h2>','<h2>Install on your phone</h2>'), body, function(sh){
+    var b=sh.querySelector("#in-go");
+    if(b) b.onclick=function(){ installEvt.prompt(); installEvt.userChoice.then(function(){ installEvt=null; closeSheet(); }); };
+  });
+}
+
 /* ===================== promemoria di backup ===================== */
 var BK_KEY="bestiario.backup.v1", BK_DAYS=7, BK_SNOOZE=3;
 function bkState(){
@@ -3479,7 +3762,7 @@ function importBackup(){
         var d=JSON.parse(fr.result);
         if(!d||!Array.isArray(d.creatures)) throw new Error("formato");
         confirmSheet(L("Importare ","Import ")+d.creatures.length+L(" creature?"," creatures?"),L("I dati attuali di questo dispositivo verranno sostituiti.","The current data on this device will be replaced."),L("Importa","Import"),function(){
-          S={v:1,creatures:d.creatures,parked:d.parked||[],updated:d.updated||null};
+          S={v:1,creatures:d.creatures,parked:d.parked||[],checks:d.checks||[],updated:d.updated||null};
           clearSprites(); save(); closeSheet(); render(); toast(L("Bestiario importato.","Bestiary imported."));
         });
       }catch(e){ toast(L("File non valido.","Invalid file.")); }
@@ -3527,6 +3810,9 @@ askPersist();
 render();
 if(declutter()) save();
 if(!introSeen()) setTimeout(showIntro, 350);
+else if(/[?&]rassegna\b/.test(location.search) && living().length) setTimeout(openRassegna, 400);
+if("serviceWorker" in navigator && /^https?:$/.test(location.protocol))
+  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ bake=null; redraw(); });
 })();
 </script>
